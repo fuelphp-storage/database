@@ -1,0 +1,13 @@
+{
+    "name": "fuelphp/database",
+    "description": "FuelPHP Database Component",
+    "autoload": {
+		"psr-0": {
+            "FuelPHP\\Database": "src/"
+        }
+	},
+	"require": {
+		"psr/log": "1.0.*",
+		"doctrine/dbal": "2.3.*"
+	}
+}
