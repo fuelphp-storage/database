@@ -1,157 +1,114 @@
 <?php
-/**
- * FuelPHP\Database is an easy flexible PHP 5.3+ Database Abstraction Layer
- *
- * @package    FuelPHP\Database
- * @version    1.0
- * @author     Frank de Jonge
- * @license    MIT License
- * @copyright  2011 - 2012 FuelPHP Development Team
- */
 
 namespace FuelPHP\Database\Schema;
 
-use FuelPHP\Databse\Connection;
+use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
+use Doctrine\DBAL\Schema\Table as DoctrineTable;
+use Doctrine\DBAL\Schema\Column as DoctrineColumn;
 
-class Table extends Collector
+class Table
 {
-	/**
-	 * @var  string  $table  table name
-	 */
-	public $table;
+	protected $table;
 
-	/**
-	 * @var  array  $fields  fields
-	 */
-	public $fields = array();
+	protected $schema;
 
-	/**
-	 * @var  array  $indexes  indexes
-	 */
-	public $indexes = array();
-
-	/**
-	 * Constructor
-	 *
-	 * @param  string   $table   table name
-	 * @param  Closure  $config  configuration closure
-	 */
-	public function __construct($table, Closure $config = null)
+	public function __construct(DoctrineTable $table, DoctrineSchema $schema)
 	{
 		$this->table = $table;
-		$config and $config($this);
+		$this->schema = $schema;
 	}
 
-	public function addField($name, $type, $default = null)
+	public function string($name, $length = null, $default = null)
 	{
-		$field = new Field($name, $type, $default);
-		$this->fields[] = $field;
-
-		return $field;
+		return new Column($this->table->addColumn($name, 'string', array(
+			'length' => $length,
+			'default' => $default,
+		)), $this);
 	}
 
-	public function increment($name, $length = 11)
+	public function integer($name, $length = null, $default = null)
 	{
-		return $this->addField($name, 'integer')
-			->length($length)
-			->autoIncrement(true);
+		return new Column($this->table->addColumn($name, 'integer', array(
+			'length' => $length,
+			'default' => $default,
+		)), $this);
 	}
 
-	public function varchar($name, $length, $default = null)
+	public function drop($column)
 	{
-		return $this->addField($name, 'varchar', $default)
-			->length($length);
-	}
-
-	public function integer($name, $length, $default = null)
-	{
-		return $this->addField($name, 'integer', $default)->length($length);
-	}
-
-	public function enum($name, $options, $default = null)
-	{
-		return $this->addField($name, 'enum', $default)->options($options);
-	}
-
-	public function decimal($name, $length, $scale, $default = null)
-	{
-		return $this->addField($name, 'decimal', $default)->length($length)->scale($scale);
-	}
-
-	public function float($name, $length, $scale, $default = null)
-	{
-		return $this->addField($name, 'float', $default)->length($length)->scale($scale);
-	}
-
-	public function boolean($name, $default = null)
-	{
-		return $this->addField($name, 'boolean', $default);
-	}
-
-	public function timestamp($name, $default = 0)
-	{
-		return $this->addField($name, 'timestamp', $default);
-	}
-
-	public function text($name, $default = null)
-	{
-		return $this->addField($name, 'text', $default);
-	}
-
-	public function textarea($name, $default = null)
-	{
-		return $this->text($name, $default);
-	}
-
-	public function index($type, $fields, $name = null)
-	{
-		if ( ! $name)
-		{
-			$name = static::indexName($fields, $type);
-		}
-
-		$action = 'add';
-		$this->indexes[] = compact('type', 'fields', 'name', 'action');
+		$this->table->dropColumn($column);
 
 		return $this;
 	}
 
-	public function primary($fields, $name = null)
+	public function boolean($name, $default = false)
 	{
-		return $this->index('primary', $fields, $name);
+		return new Column($this->table->addColumn($name, 'boolean', array(
+			'default' => $default,
+		)), $this);
 	}
 
-	public function unique($fields, $name = null)
+	public function change($name)
 	{
-		return $this->index('unique', $fields, $name);
+		return new Column($this->table->getColumn($name), $this);
 	}
 
-	public function fulltext($fields, $name = null)
+	public function copy($column, $as)
 	{
-		return $this->index('fulltext', $fields, $name);
+		$column = $this->table->getColumn($column);
+
+		return new Column($this->table->addColumn($as, strtolower($column->getType()), $column->toArray()), $this);
 	}
 
-	public function dropIndex($index, $type = null)
+	public function rename($from, $to)
 	{
-		$action = 'drop';
-		$name = static::indexName($index, $type);
-		$this->indexes[] = compact('type', 'name', 'action');
+		$this->copy($from, $to);
+
+		return $this->drop($from);
+	}
+
+	public function engine($engine)
+	{
+		$this->table->addOption('engine', $engine);
 
 		return $this;
 	}
 
-	public static function indexName($index, $type = null)
+	public function charset($charset)
 	{
-		if (is_array($index))
+		$this->table->addOption('charset', $charset);
+
+		return $this;
+	}
+
+	public function collate($collate)
+	{
+		$this->table->addOption('collate', $collate);
+
+		return $this;
+	}
+
+	public function __call($method, $arguments)
+	{
+		if ( ! method_exists($this->table, $method) and ! method_exists($this->table, $method = 'set'.ucfirst($method)))
 		{
-			$index = implode('_', $index);
+			throw new \BadMethodCallException('Call to undefined function '.get_class($this).'::'.$method);
 		}
 
-		if ($type)
+		$result = call_user_func_array(array($this->table, $method), $arguments);
+
+		// Ensure chaining for the table
+		if ($result instanceof DoctrineTable)
 		{
-			$index .= '_'.$type;
+			return $this;
 		}
 
-		return $index;
+		// Construct a column wrapper for retrieved columns
+		elseif ($result instanceof DoctrineColumn)
+		{
+			return new Column($result, $this);
+		}
+
+		return $result;
 	}
 }

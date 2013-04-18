@@ -16,4 +16,15 @@ use FuelPHP\Database\Connection;
 class Sqlite extends Connection
 {
 	protected $driver = 'sqlite';
+
+	/**
+	 * Set the connection charset
+	 *
+	 * @param   string  $charset  charset
+	 * @return  $this
+	 */
+	public function setCharset($charset)
+	{
+		return $this;
+	}
 }

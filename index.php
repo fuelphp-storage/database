@@ -31,7 +31,7 @@ class Dummy
 };
 
 $connection = DB::connection(array(
-	'driver' => 'pgsql',
+	'driver' => 'mysql',
 	'username' => 'root',
 	'password' => 'root',
 	'database' => 'ku_cms',
@@ -39,14 +39,23 @@ $connection = DB::connection(array(
 
 $schema = $connection->getSchema();
 
-print_r($schema->alterTable('some_table', function($table) {
-	$table->addColumn('something', 'string', array(
-		'length' => 20
-	));
-
-	$table->getColumn('uid')->setName('whaaa');
+print_r($schema->createTable('new_table', function($table) {
+	$table->integer('id')->increment();
+	$table->string('name', 250)->null();
+	$table->string('surname', 250)->null();
+	$table->engine('MyISAM');
 }));
 
+print_r($schema->alterTable('some_table', function($table) {
+	$table->string('something', 20);
+	$table->boolean('boelala', true);
+	$table->string('lala', 20)->default('wow');
+	$table->change('uid')->default(11);
+	$table->drop('uid');
+	$table->rename('name', 'other_name');
+}));
+
+print_r($schema->dropTable('some_table'));
 // $platform = $doctrineSchema->getDatabasePlatform();
 // $schema = $doctrineSchema->createSchema();
 // $table = $schema->getTable('some_table');

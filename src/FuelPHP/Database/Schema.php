@@ -14,6 +14,8 @@ namespace FuelPHP\Database;
 use Closure;
 use Doctrine\DBAL\Schema\Comparator as DoctrineComparator;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
+use Doctrine\DBAL\Schema\Table as DoctrineTable;
+use Doctrine\DBAL\Schema\Column as DoctrineColumn;
 
 class Schema
 {
@@ -34,33 +36,55 @@ class Schema
 
 	public function getPlatform()
 	{
-		return $this->connection->getDoctrineSchema()->getDatabasePlatform();
-	}
-
-	public function getComparator()
-	{
-		return new DoctrineComparator;
-
-		if ( ! $this->comparator)
-		{
-			$this->comparator = new DoctrineComparator;
-		}
-
-		return $this->comparator;
+		return $this->connection
+			->getDoctrineSchema()
+			->getDatabasePlatform();
 	}
 
 	public function getSchema()
 	{
-		return $this->connection->getDoctrineSchema()->createSchema();
+		return $this->connection
+			->getDoctrineSchema()
+			->createSchema();
 	}
 
 	public function alterTable($table, Closure $config)
 	{
 		$schema = $this->getSchema();
 		$newSchema = clone $schema;
-		$table = $newSchema->getTable($table);
+		$table = new Schema\Table($newSchema->getTable($table), $schema);
 		$config($table);
-		$diff = $this->getComparator()->compare($schema, $newSchema);
+		$comparator = new DoctrineComparator;
+		$diff = $comparator->compare($schema, $newSchema);
+
+		return (array) $diff->toSql($this->getPlatform());
+	}
+
+	public function renameTable($from, $to)
+	{
+		$schema = $this->getSchema();
+		$from = $schema->getTable($from);
+		//$to =
+	}
+
+
+
+	public function createTable($table, Closure $config)
+	{
+		$schema = new DoctrineSchema;
+		$table = new Schema\Table($schema->createTable($table), $schema);
+		$config($table);
+
+		return (array) $schema->toSql($this->getPlatform());
+	}
+
+	public function dropTable($table)
+	{
+		$schema = $this->getSchema();
+		$old = clone $schema;
+		$table = $schema->dropTable($table);
+		$comparator = new DoctrineComparator;
+		$diff = $comparator->compare($old, $schema);
 
 		return (array) $diff->toSql($this->getPlatform());
 	}
