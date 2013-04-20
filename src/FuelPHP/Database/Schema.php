@@ -36,16 +36,17 @@ class Schema
 
 	public function getPlatform()
 	{
-		return $this->connection
-			->getDoctrineSchema()
-			->getDatabasePlatform();
+		return $this->getSchemaManager()->getDatabasePlatform();
+	}
+
+	public function getSchemaManager()
+	{
+		return $this->connection->getDoctrineSchema();
 	}
 
 	public function getSchema()
 	{
-		return $this->connection
-			->getDoctrineSchema()
-			->createSchema();
+		return $this->getSchemaManager()->createSchema();
 	}
 
 	public function alterTable($table, Closure $config)
@@ -64,10 +65,7 @@ class Schema
 	{
 		$schema = $this->getSchema();
 		$from = $schema->getTable($from);
-		//$to =
 	}
-
-
 
 	public function createTable($table, Closure $config)
 	{
@@ -87,5 +85,17 @@ class Schema
 		$diff = $comparator->compare($old, $schema);
 
 		return (array) $diff->toSql($this->getPlatform());
+	}
+
+	public function tableDetails($table)
+	{
+		$schema = $this->getSchemaManager();
+
+		return $schema->listTableDetails($table);
+	}
+
+	public function store()
+	{
+		return serialize($this->getSchema());
 	}
 }

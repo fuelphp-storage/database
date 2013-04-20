@@ -31,19 +31,35 @@ class Dummy
 };
 
 $connection = DB::connection(array(
-	'driver' => 'mysql',
+	'driver' => 'pgsql',
 	'username' => 'root',
 	'password' => 'root',
 	'database' => 'ku_cms',
 ));
 
+die($connection->select('*')
+	->from('users')
+	->where(function($where){
+		$where->where('this', 'that')
+			->orWhere('sus', DB::value('zo'));
+	})
+	->andWhere('what', array('some', 'vals'))
+	->where('time', '<', DB::command('now'))
+	->getQuery());
+
 $schema = $connection->getSchema();
+
+//print_r($schema->tableDetails('some_table'));
 
 print_r($schema->createTable('new_table', function($table) {
 	$table->integer('id')->increment();
 	$table->string('name', 250)->null();
 	$table->string('surname', 250)->null();
+	$table->string('email', 250)->nullable()->unique();
 	$table->engine('MyISAM');
+	$table->unique(array(
+		'name', 'surname',
+	), 'full_name');
 }));
 
 print_r($schema->alterTable('some_table', function($table) {

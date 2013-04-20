@@ -8,30 +8,45 @@ use Doctrine\DBAL\Schema\Column as DoctrineColumn;
 
 class Table
 {
+	/**
+	 * @var  \Doctrine\DBAL\Schema\Table  $table
+	 */
 	protected $table;
 
-	protected $schema;
-
-	public function __construct(DoctrineTable $table, DoctrineSchema $schema)
+	/**
+	 * Constructor
+	 *
+	 * @param   \Doctrine\DBAL\Schema\Table  $table  Doctrine table object
+	 */
+	public function __construct(DoctrineTable $table)
 	{
 		$this->table = $table;
-		$this->schema = $schema;
 	}
+
+	/**
+	 * Add a column
+	 *
+	 * @param   string  $name     column name
+	 * @param   string  $type     column type
+	 * @param   array   $options  column options
+	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 */
+	public function add($name, $type, array $options)
+	{
+		$column = $this->table->addColumn($name, $type, $options);
+
+		return new Column($column, $this);
+	}
+
 
 	public function string($name, $length = null, $default = null)
 	{
-		return new Column($this->table->addColumn($name, 'string', array(
-			'length' => $length,
-			'default' => $default,
-		)), $this);
+		return $this->add($name, 'string', compact('length', 'default'));
 	}
 
 	public function integer($name, $length = null, $default = null)
 	{
-		return new Column($this->table->addColumn($name, 'integer', array(
-			'length' => $length,
-			'default' => $default,
-		)), $this);
+		return $this->add($name, 'integer', compact('length', 'default'));
 	}
 
 	public function drop($column)
@@ -43,23 +58,57 @@ class Table
 
 	public function boolean($name, $default = false)
 	{
-		return new Column($this->table->addColumn($name, 'boolean', array(
-			'default' => $default,
-		)), $this);
+		return $this->add($name, 'boolean', compact('default'));
 	}
 
+	public function bool($name, $default = false)
+	{
+		return $this->boolean($name, $defaut);
+	}
+
+	public function decimal($name, $precision, $scale, $default = null)
+	{
+		return $this->add('decimal', $name, compact('precision', 'scale', 'default'));
+	}
+
+	public function float($name, $precision, $scale, $default = null)
+	{
+		return $this->add('float', $name, compact('precision', 'scale', 'default'));
+	}
+
+	/**
+	 * Return a column to be modified
+	 *
+	 * @param   string  $name  column name
+	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 */
 	public function change($name)
 	{
 		return new Column($this->table->getColumn($name), $this);
 	}
 
+	/**
+	 * Copy and add a column
+	 *
+	 * @param   string  $name  column name
+	 * @param   string  $as    new column name
+	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 */
 	public function copy($column, $as)
 	{
 		$column = $this->table->getColumn($column);
+		$new = $this->table->addColumn($as, strtolower($column->getType()), $column->toArray());
 
-		return new Column($this->table->addColumn($as, strtolower($column->getType()), $column->toArray()), $this);
+		return new Column($new, $this);
 	}
 
+	/**
+	 * Copy and drop the old column.
+	 *
+	 * @param   string  $from  column to copy
+	 * @param   string  $to    new column name
+	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 */
 	public function rename($from, $to)
 	{
 		$this->copy($from, $to);
@@ -67,6 +116,12 @@ class Table
 		return $this->drop($from);
 	}
 
+	/**
+	 * Sets the engine option
+	 *
+	 * @param   string  $engine  engine
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
 	public function engine($engine)
 	{
 		$this->table->addOption('engine', $engine);
@@ -74,6 +129,12 @@ class Table
 		return $this;
 	}
 
+	/**
+	 * Sets the charset option
+	 *
+	 * @param   string  $charset  charset
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
 	public function charset($charset)
 	{
 		$this->table->addOption('charset', $charset);
@@ -81,6 +142,12 @@ class Table
 		return $this;
 	}
 
+	/**
+	 * Sets the collate option
+	 *
+	 * @param   string  $collate  collate
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
 	public function collate($collate)
 	{
 		$this->table->addOption('collate', $collate);
@@ -88,6 +155,66 @@ class Table
 		return $this;
 	}
 
+	/**
+	 * Adds an index
+	 *
+	 * @param   string  $fields  fields
+	 * @param   string  $name    index name
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
+	public function index($fields, $name = null)
+	{
+		$fields = (array) $fields;
+
+		$this->table->addIndex($fields, $name);
+
+		return $this;
+	}
+
+	/**
+	 * Drop an index
+	 *
+	 * @param   string  $name  index name
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
+	public function dropIndex($name)
+	{
+		$this->table->dropIndex($name);
+
+		return $this;
+	}
+
+	/**
+	 * Adds a unique index
+	 *
+	 * @param   string  $fields  fields
+	 * @param   string  $name    index name
+	 * @return  \FuelPHP\Database\Schema\Table  table
+	 */
+	public function unique($fields, $name)
+	{
+		$this->table->addUniqueIndex((array) $fields, $name);
+
+		return $this;
+	}
+
+	/**
+	 * __toString
+	 *
+	 * @return  string  table name
+	 */
+	public function __toString()
+	{
+		return $this->table->getName();
+	}
+
+	/**
+	 * Call fallthrough to Doctrine table object.
+	 *
+	 * @param   string  $method     method name
+	 * @param   array   $arguments  method arguments
+	 * @return  mixed   call result
+	 */
 	public function __call($method, $arguments)
 	{
 		if ( ! method_exists($this->table, $method) and ! method_exists($this->table, $method = 'set'.ucfirst($method)))

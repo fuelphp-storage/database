@@ -12,6 +12,7 @@
 namespace FuelPHP\Database\Expression;
 
 use FuelPHP\Database\Expression;
+use FuelPHP\Database\Connection;
 
 class Command extends Expression
 {

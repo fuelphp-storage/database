@@ -22,7 +22,7 @@ abstract class Collector extends Query
 	 */
 	public function getQuery(Compiler $compiler = null)
 	{
-		if ( ! $compiler)
+		if ( ! $compiler and ! $compiler = $this->compiler)
 		{
 			throw new Exception('Query building needs a compiler to generage SQL.');
 		}

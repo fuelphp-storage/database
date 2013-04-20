@@ -109,7 +109,7 @@ class DB
 	public static function command($command)
 	{
 		$arguments = func_get_args();
-		$command = new Command(array_pop($arguments));
+		$command = new Expression\Command(array_pop($arguments));
 		$command->arguments = $arguments;
 
 		return $command;

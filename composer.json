@@ -9,5 +9,9 @@
 	"require": {
 		"psr/log": "1.0.*",
 		"doctrine/dbal": "2.3.*"
+	},
+	"require-dev": {
+		"mockery/mockery": "0.8.*",
+		"fuelphp/alias": "0.1.*"
 	}
 }
