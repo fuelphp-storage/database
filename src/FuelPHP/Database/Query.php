@@ -49,9 +49,19 @@ class Query
 	public $lateProperties;
 
 	/**
+	 *  @var  string|null  $resultCollection  result collection classname
+	 */
+	public $resultCollection;
+
+	/**
 	 * @param  object  $fetchInto  object to fetch into
 	 */
 	public $fetchInto;
+
+	/**
+	 * @var  string  $insertIdField  field used for lastInsertId
+	 */
+	public $insertIdField;
 
 	/**
 	 * Constructor
@@ -63,6 +73,38 @@ class Query
 	{
 		$this->query = $query;
 		$this->type = $type;
+	}
+
+	/**
+	 * Sets/Gets the field used for lastInsertId
+	 *
+	 * @param   string  $field  insert id field
+	 * @return  $this
+	 */
+	public function insertIdField($field)
+	{
+		$this->insertIdField = $field;
+
+		return $this;
+	}
+
+	/**
+	 * Retrieve the last insert ID field
+	 *
+	 * @param   Connection  $connection
+	 * @return  string
+	 */
+	public function getInsertIdField(Connection $connection = null)
+	{
+		if (($field = $this->insertIdField) !== null)
+		{
+			return $field;
+		}
+
+		if ($connection or $connection = $this->connection)
+		{
+			return $connection->config['insertIdField'];
+		}
 	}
 
 	/**
@@ -113,17 +155,27 @@ class Query
 	public function getOptions(Connection $connection = null)
 	{
 		$asObject = $this->asObject;
+		$lateProperties = $this->lateProperties;
+		$resultCollection = $this->resultCollection;
+
+		if ( ! $connection)
+		{
+			$connection = $this->connection;
+		}
 
 		if ($asObject === null and $connection)
 		{
 			$asObject = $connection->config['asObject'];
 		}
 
-		$lateProperties = $this->lateProperties;
-
 		if ($lateProperties === null and $connection)
 		{
-			$lateProperties = $this->connection->config['lateProperties'];
+			$lateProperties = $connection->config['lateProperties'];
+		}
+
+		if ($resultCollection === null and $connection)
+		{
+			$resultCollection = $connection->config['resultCollection'];
 		}
 
 		return array(
@@ -131,6 +183,8 @@ class Query
 			'lateProperties' => $lateProperties,
 			'constructorArguments' => $this->constructorArguments,
 			'fetchInto' => $this->fetchInto,
+			'resultCollection' => $resultCollection,
+			'insertIdField' => $this->getInsertIdField($connection),
 		);
 	}
 
@@ -203,7 +257,7 @@ class Query
 	 */
 	public function bindParam($name, &$value)
 	{
-		$this->params[$name] = $value;
+		$this->params[$name] = &$value;
 
 		return $this;
 	}
@@ -228,7 +282,7 @@ class Query
 	 * @param   Compiler  $compiler  query compiler
 	 * @return  string    sql query
 	 */
-	public function compile(Compiler $compiler = null)
+	public function getQuery(Compiler $compiler = null)
 	{
 		return $this->query;
 	}

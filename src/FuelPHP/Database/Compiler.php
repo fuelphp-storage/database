@@ -35,7 +35,7 @@ abstract class Compiler
 			'LimitOffset',
 		),
 		'insert' => array(
-			'Insert', 'Values'
+			'Insert', 'Values', 'Returning',
 		),
 		'update' => array(
 			'Update', 'Set', 'Where', 'OrderBy',
@@ -100,6 +100,19 @@ abstract class Compiler
 	}
 
 	/**
+	 * Compiles a CONCAT statement
+	 *
+	 * @param   array   $params  parameters to concat
+	 * @return  string  concat statement
+	 */
+	public function compileCommandConcat($params)
+	{
+		$params = array_map(array($this, 'quote'), $param);
+
+		return implode(' || ', $params);
+	}
+
+	/**
 	 * Compiles query identifiers
 	 *
 	 * @param   array   $identifiers  identifiers
@@ -122,6 +135,17 @@ abstract class Compiler
 	public function compileInsert(Collector $collector)
 	{
 		return 'INSERT INTO '.$this->quoteIdentifier($collector->table);
+	}
+
+	/**
+	 * Compile a returning statement
+	 *
+	 * @param   Collector  $collection  query collector
+	 * @return  string     returning sql
+	 */
+	public function compileReturning(Collector $collector)
+	{
+		return '';
 	}
 
 	/**
@@ -515,7 +539,7 @@ abstract class Compiler
 		elseif ($value instanceof Query)
 		{
 			// create a sub-query
-			return '('.$value->compile($this).')';
+			return '('.$value->getQuery($this).')';
 		}
 
 		elseif ($value instanceof Expression)
@@ -526,7 +550,9 @@ abstract class Compiler
 
 		elseif (is_array($value))
 		{
-			return '('.implode(', ', array_map(array($this, 'quote'), $value)).')';
+			$value = array_map(array($this, 'quote'), $value);
+
+			return '('.implode(', ', $value).')';
 		}
 
 		elseif (is_int($value))

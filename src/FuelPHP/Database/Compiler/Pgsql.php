@@ -12,8 +12,21 @@
 namespace FuelPHP\Database\Compiler;
 
 use FuelPHP\Database\Compiler;
+use FuelPHP\Database\Collector;
 
 class Pgsql extends Compiler
 {
-
+	/**
+	 * Compile a returning statement
+	 *
+	 * @param   Collector  $collection  query collector
+	 * @return  string     returning sql
+	 */
+	public function compileReturning(Collector $collector)
+	{
+		if ($returning = $collector->getInsertIdField())
+		{
+			return 'RETURNING '.$this->quoteIdentifier($returning);
+		}
+	}
 }

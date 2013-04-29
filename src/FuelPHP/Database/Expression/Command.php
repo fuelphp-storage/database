@@ -27,6 +27,11 @@ class Command extends Expression
 	public $arguments;
 
 	/**
+	 * @var  string  $alias  alias
+	 */
+	public $alias;
+
+	/**
 	 * Constructor
 	 *
 	 * @param   string  $value  command name
@@ -39,16 +44,54 @@ class Command extends Expression
 	}
 
 	/**
+	 * Set the return value alias
+	 *
+	 * @param   string  $alias  alias
+	 * @return  $this
+	 */
+	public function alias($alias)
+	{
+		$this->alias = $alias;
+
+		return $this;
+	}
+
+	/**
+	 * Format the concat statement
+	 *
+	 * @param    FuelPHP\Database\Connection  $connection
+	 * @return   string  concat statement
+	 */
+	public function compileConcat($connection)
+	{
+		$compiler = $connection->getCompiler();
+
+		if (method_exists($compiler, $method = 'compileCommand'.ucfirst($this->command)))
+		{
+			return call_user_func_array(array($compiler, $method), $this->arguments);
+		}
+
+		$command = strtoupper($this->command);
+		$arguments = empty($this->arguments) ? '' : $connection->quote($this->arguments);
+
+		return $command .'('.$arguments.')';
+	}
+
+	/**
 	 * Compiles the command.
 	 *
 	 * @param   FuelPHP\Database\Connection  $connection
 	 * @return  string                       command
 	 */
-	public function getValue(Connection $connetion)
+	public function getValue(Connection $connection)
 	{
-		$command = strtoupper($this->command);
-		$arguments = empty($this->arguments) ? '' : $connetion->quote($this->arguments);
+		$statement = $this->compileConcat($connection);
 
-		return $command .'('.$arguments.')';
+		if ($this->alias)
+		{
+			return $statement.' AS '.$this->alias;
+		}
+
+		return $statement;
 	}
 }

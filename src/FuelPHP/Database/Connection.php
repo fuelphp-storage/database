@@ -13,6 +13,7 @@ namespace FuelPHP\Database;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Doctrine\DBAL\DriverManager as DoctrineManager;
@@ -28,22 +29,25 @@ abstract class Connection implements LoggerAwareInterface
 	 * @var  array  $configDefaults  configuration defaults
 	 */
 	protected $configDefaults = array(
-		'profiling'      => false,
-		'asObject'       => true,
-		'lateProperties' => false,
-		'connection'     => null,
-		'autoConnect'    => true,
-		'dns'            => false,
-		'username'       => '',
-		'password'       => '',
-		'port'           => null,
-		'host'           => 'localhost',
-		'socket'         => null,
-		'charset'        => 'utf8',
-		'persistent'     => true,
-		'attributes'     => array(),
-		'insertIdField'  => 'id',
-		'database'       => null,
+		'profiling'         => false,
+		'asObject'          => true,
+		'lateProperties'    => false,
+		'resultCollection'  => null,
+		'connection'        => null,
+		'autoConnect'       => true,
+		'dns'               => false,
+		'username'          => '',
+		'password'          => '',
+		'port'              => null,
+		'host'              => 'localhost',
+		'socket'            => null,
+		'charset'           => 'utf8',
+		'persistent'        => true,
+		'attributes'        => array(),
+		'insertIdField'     => 'id',
+		'database'          => null,
+		'logger'            => null,
+		'pdo'               => null,
 	);
 
 	/**
@@ -59,7 +63,7 @@ abstract class Connection implements LoggerAwareInterface
 	/**
 	 * @var  array  $config  configuration
 	 */
-	protected $config;
+	public $config;
 
 	/**
 	 * @var  PDO  $pdo  PDO connection
@@ -92,6 +96,11 @@ abstract class Connection implements LoggerAwareInterface
 	protected $savepoint = 0;
 
 	/**
+	 * @var  array  $lastQuery  last query info
+	 */
+	protected $lastQuery;
+
+	/**
 	 * Constructor
 	 *
 	 * @param  array  $config  connection config
@@ -101,6 +110,11 @@ abstract class Connection implements LoggerAwareInterface
 		if (isset($config['pdo']))
 		{
 			$this->pdo = $config['pdo'];
+		}
+
+		if (isset($config['logger']))
+		{
+			$this->setLogger($config['logger']);
 		}
 
 		$this->setConfig($config);
@@ -156,24 +170,6 @@ abstract class Connection implements LoggerAwareInterface
 	}
 
 	/**
-	 * Retrieve the query compiler
-	 *
-	 * @return  FuelPHP\Database\Compiler  compiler object
-	 */
-	public function getSchemaCompiler()
-	{
-		if ( ! $this->schemaCompiler)
-		{
-			$driver = ucfirst($this->driver);
-			$class = 'FuelPHP\Database\Schema\Compiler\\'.$driver;
-
-			$this->schemaCompiler = new $class($this);
-		}
-
-		return $this->schemaCompiler;
-	}
-
-	/**
 	 * Retrieve a schema instance
 	 *
 	 * @return  Schema  schema instance
@@ -188,6 +184,11 @@ abstract class Connection implements LoggerAwareInterface
 		return $this->schema;
 	}
 
+	/**
+	 * Get a docrine schema managers
+	 *
+	 * @return   \Doctrine\DBAL\Schema\AbstractSchemaManager
+	 */
 	public function getDoctrineSchema()
 	{
 		$connection = DoctrineManager::getConnection(array(
@@ -370,7 +371,7 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	public function lastQueryOptions()
 	{
-		if ($info = $this->lastQuery())
+		if ($info = $this->lastQueryInfo())
 		{
 			return $info['options'];
 		}
@@ -412,6 +413,7 @@ abstract class Connection implements LoggerAwareInterface
 			'lateProperties' => $this->config['lateProperties'],
 			'constructorArguments' => array(),
 			'fetchInto' => null,
+			'insertIdField' => $this->config['insertIdField'],
 		);
 
 		if ($query instanceof Query)
@@ -432,16 +434,12 @@ abstract class Connection implements LoggerAwareInterface
 
 		foreach ($params as $name => $value)
 		{
-			if ($value instanceof Expression)
-			{
-				$value = $value->getValue($this);
-				$query = str_replace(':'.$name, $value, $query);
-				continue;
+			if ($value instanceof Expression) {
+				$replacements[':'.$name] = $value->getValue($this);
+			} else {
+				$input[$name] = $value;
 			}
-
-			$input[$name] = $value;
 		}
-
 
 		if ( ! empty($replacements))
 		{
@@ -492,14 +490,34 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	public function executeInsert($query, array $params, array $options)
 	{
-		$statement = $this->getPdo()->prepare($query);
+		$statement = $this->getPdo()
+			->prepare($query);
 		$statement->execute($params);
-		$insertIdField = $this->config['insertIdField'];
 
 		return array(
-			(int) $this->pdo->lastInsertId($insertIdField),
+			$this->getLastInsertId($statement, $options),
 			$statement->rowCount(),
 		);
+	}
+
+	/**
+	 * Retrieve the last insert id from an insert query
+	 *
+	 * @param   PDOStatement  $statement
+	 * @param   array         $options
+	 * @return  mixed
+	 */
+	public function getLastInsertId($statement, array $options)
+	{
+		$id = $this->getPdo()
+			->lastInsertId($options['insertIdField']);
+
+		if (is_numeric($id))
+		{
+			return (int) $id;
+		}
+
+		return $id;
 	}
 
 	/**
@@ -512,7 +530,8 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	protected function executeSelect($query, array $params, array $options)
 	{
-		$statement = $this->getPdo()->prepare($query);
+		$statement = $this->getPdo()
+			->prepare($query);
 
 		if ( ! $statement->execute($params))
 		{
@@ -527,7 +546,7 @@ abstract class Connection implements LoggerAwareInterface
 			$result = $statement->fetch();
 			$statement->closeCursor();
 
-			return $result;
+			return $options['fetchInto'];
 		}
 
 		if ( ! $options['asObject'])
@@ -659,7 +678,6 @@ abstract class Connection implements LoggerAwareInterface
 
 		return $this;
 	}
-
 
 	/**
 	 * DB class call forwarding. Sets the current connection if setter is available.

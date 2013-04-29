@@ -33,9 +33,14 @@ class DB
 	 */
 	public static function connection(array $config)
 	{
-		if ( ! isset($config['driver']) or ! class_exists($class = 'FuelPHP\Database\Connection\\'.ucfirst($config['driver'])))
+		if ( ! isset($config['driver']))
 		{
-			throw new Exception('Cannot create a connection without a driver');
+			$config['driver'] = 'mysql';
+		}
+
+		if ( ! class_exists($class = 'FuelPHP\Database\Connection\\'.ucfirst($config['driver'])))
+		{
+			throw new Exception('Cannot create a connection without a valid driver');
 		}
 
 		return new $class($config);
@@ -184,15 +189,5 @@ class DB
 	public static function insert($table)
 	{
 		return new Collector\Insert($table);
-	}
-
-	/**
-	 * Creates a schema collector object.
-	 *
-	 * @return  object   schema query collector object
-	 */
-	public static function schema(Connection $connection)
-	{
-		return new Collector\Schema($connection);
 	}
 }

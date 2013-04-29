@@ -19,4 +19,11 @@ class Mysql extends Compiler
 	 * @var  string  $tableQuote  table quote
 	 */
 	public $tableQuote = '`';
+
+	public function compileCommandConcat($params)
+	{
+		$params = $this->quote($params);
+
+		return 'CONCAT('.$params.')';
+	}
 }

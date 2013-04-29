@@ -3,6 +3,7 @@
 namespace FuelPHP\Database\Expression;
 
 use FuelPHP\Database\Expression;
+use FuelPHP\Database\Connection;
 
 class Increment extends Expression
 {

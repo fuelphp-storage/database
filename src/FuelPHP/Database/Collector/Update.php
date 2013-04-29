@@ -12,7 +12,7 @@
 namespace FuelPHP\Database\Collector;
 
 use FuelPHP\Database\DB;
-use FuelPHP\Database\Increment;
+use FuelPHP\Database\Expression\Increment;
 
 class Update extends Where
 {

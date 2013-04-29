@@ -22,11 +22,6 @@ class Insert extends Collector
 	public $type = DB::INSERT;
 
 	/**
-	 * @var  string  $insertIdField  field used for lastInsertId
-	 */
-	public $insertIdField;
-
-	/**
 	 * @var  array  $columns  columns to use
 	 */
 	public $columns = array();
@@ -44,24 +39,6 @@ class Insert extends Collector
 	public function __construct($table)
 	{
 		$this->into($table);
-	}
-
-	/**
-	 * Sets/Gets the field used for lastInsertId
-	 *
-	 * @param   string
-	 * @return  mixed  current instance when setting, string fieldname when gettting.
-	 */
-	public function insertIdField($field = null)
-	{
-		if ($field)
-		{
-			$this->insertIdField = $field;
-
-			return $this;
-		}
-
-		return $this->insertIdField;
 	}
 
 	/**

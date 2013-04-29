@@ -12,6 +12,7 @@
 	},
 	"require-dev": {
 		"mockery/mockery": "0.8.*",
-		"fuelphp/alias": "0.1.*"
+		"fuelphp/alias": "0.1.*",
+		"monolog/monolog": "1.5.*"
 	}
 }

@@ -35,7 +35,12 @@ $connection = DB::connection(array(
 	'username' => 'root',
 	'password' => 'root',
 	'database' => 'ku_cms',
+	'persistant' => false,
 ));
+
+var_dump($connection->insert('tester')->values(array(
+	'name' => 'Frank',
+))->execute());
 
 die($connection->select('*')
 	->from('users')
