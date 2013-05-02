@@ -11,7 +11,7 @@
 
 namespace FuelPHP\Database;
 
-class Query
+class Query implements ConnectionAwareInterface
 {
 	/**
 	 * @var  $type  const  query type
@@ -32,6 +32,11 @@ class Query
 	 * @param  Connection  $connection  connection object
 	 */
 	public $connection;
+
+	/**
+	 * @param  Compiler  $compiler  compiler object
+	 */
+	public $compiler;
 
 	/**
 	 * @param  array  $constructorArguments  constructor arguments

@@ -150,4 +150,13 @@ class QueryTests extends PHPUnit_Framework_TestCase
 		$query = new Query('');
 		$query->execute();
 	}
+
+	/**
+	 * @expectedException FuelPHP\Database\Exception
+	 */
+	public function testNoConnection()
+	{
+		$query = new Collector\Select;
+		$query->getQuery();
+	}
 }

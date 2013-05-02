@@ -266,4 +266,37 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('string', $connection->getLastInsertId(false, array('insertIdField' => 'id')));
 	}
+
+	public function testPgSpecific()
+	{
+
+		$connection = DB::connection(array(
+			'driver' => 'pgsql',
+			'pdo' => M::mock('stdClass'),
+			'insertIdField' => null,
+		));
+
+		$insert = $connection->insert('users');
+		$compiler = $connection->getCompiler();
+		$this->assertNull($compiler->compileReturning($insert));
+		$this->assertNull($connection->getLastInsertId(false, array('insertIdField' => null)));
+		$statement = M::mock('statement');
+		$statement->shouldReceive('fetch')->once()->with(PDO::FETCH_ASSOC)->andReturn(array(
+			'id' => 1
+		));
+		$this->assertEquals(1, $connection->getLastInsertId($statement, array('insertIdField' => 'id')));
+	}
+
+	public function testMysqlSpecific()
+	{
+		$connection = DB::connection(array(
+			'driver' => 'mysql',
+			'pdo' => M::mock('stdClass'),
+		));
+
+		$compiler = $connection->getCompiler();
+		$this->assertEquals('CONCAT(`id`, " ", `name`)', $compiler->compileCommandConcat(array(
+			'id', DB::expr('" "'), 'name',
+		)));
+	}
 }

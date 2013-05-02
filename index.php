@@ -38,9 +38,14 @@ $connection = DB::connection(array(
 	'persistant' => false,
 ));
 
-var_dump($connection->insert('tester')->values(array(
-	'name' => 'Frank',
-))->execute());
+$select = $connection->select()
+	->from('table')
+	->where('a', 'b')
+	->orWhere('b', 1)
+	->having('a', 2)
+	->orNotHaving('a', 1)
+	->getQuery();
+die($select);
 
 die($connection->select('*')
 	->from('users')

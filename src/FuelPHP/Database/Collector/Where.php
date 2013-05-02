@@ -99,7 +99,7 @@ class Where extends Collector
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_where('and', $column, $op, $value);
+		return $this->addCondition('where', 'and', $column, $op, $value);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Where extends Collector
 	 */
 	public function andWhereArray(array $where)
 	{
-		$this->whereArray($where);
+		return $this->whereArray($where, 'and');
 	}
 
 	/**
@@ -138,7 +138,7 @@ class Where extends Collector
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_where('or', $column, $op, $value);
+		return $this->addCondition('where', 'or', $column, $op, $value);
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Where extends Collector
 	 */
 	public function orWhereArray(array $where)
 	{
-		$this->whereArray($where, 'or');
+		return $this->whereArray($where, 'or');
 	}
 
 	/**
@@ -163,6 +163,17 @@ class Where extends Collector
 	public function notWhere($column, $op = null, $value = null)
 	{
 		return call_user_func_array(array($this, 'andNotWhere'), func_get_args());
+	}
+
+	/**
+	 * Adds multiple 'not where' statements.
+	 *
+	 * @param   array  $where  where statements
+	 * @return  $this
+	 */
+	public function notWhereArray(array $where)
+	{
+		return $this->whereArray($where, 'not');
 	}
 
 	/**
@@ -190,7 +201,18 @@ class Where extends Collector
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_where('and', $column, $op, $value, true);
+		return $this->addCondition('where', 'and', $column, $op, $value, true);
+	}
+
+	/**
+	 * Adds multiple 'not where' statements.
+	 *
+	 * @param   array  $where  where statements
+	 * @return  $this
+	 */
+	public function andNotWhereArray(array $where)
+	{
+		return $this->whereArray($where, 'not');
 	}
 
 	/**
@@ -218,7 +240,18 @@ class Where extends Collector
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_where('or', $column, $op, $value, true);
+		return $this->addCondition('where', 'or', $column, $op, $value, true);
+	}
+
+	/**
+	 * Adds multiple 'not where' statements.
+	 *
+	 * @param   array  $where  where statements
+	 * @return  $this
+	 */
+	public function orNotWhereArray(array $where)
+	{
+		return $this->whereArray($where, 'orNot');
 	}
 
 	/**
@@ -379,8 +412,9 @@ class Where extends Collector
 	}
 
 	/**
-	 * Adds an 'and where' statement to the query
+	 * Adds a condition to a condition stack
 	 *
+	 * @param   string   $stack   condition stack
 	 * @param   string   $type    chain type
 	 * @param   mixed    $column  array of 'where' statements or column name
 	 * @param   string   $op      where logic operator
@@ -388,59 +422,15 @@ class Where extends Collector
 	 * @param   boolean  $not     wether to use NOT
 	 * @return  object   current instance
 	 */
-	protected function _where($type, $column, $op, $value, $not = false)
+	protected function addCondition($stack, $type, $column, $op, $value, $not = false)
 	{
-		if (is_array($column) and $op = null and $value = null)
-		{
-			foreach ($column as $key => $val)
-			{
-				if (is_array($val))
-				{
-					$numArgs = count($val);
-
-					if ($numArgs === 2)
-					{
-						$this->where[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' => '=',
-							'value' => $val[1],
-							'not' => false,
-						);
-					}
-					elseif ($numArgs === 3)
-					{
-						$this->where[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' =>  $val[1],
-							'value' => $val[2],
-							'not' => false,
-						);
-					}
-					else
-					{
-						$this->where[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' => $val[1],
-							'value' => $val[2],
-							'not' => $val[3]
-						);
-					}
-				}
-			}
-		}
-		else
-		{
-			$this->where[] = array(
-				'type' => $type,
-				'field' => $column,
-				'op' => $op,
-				'value' => $value,
-				'not' => $not,
-			);
-		}
+		$this->{$stack}[] = array(
+			'type' => $type,
+			'field' => $column,
+			'op' => $op,
+			'value' => $value,
+			'not' => $not,
+		);
 
 		return $this;
 	}
@@ -454,27 +444,27 @@ class Where extends Collector
 	 */
 	public function orderBy($column, $direction = null)
 	{
-		if (is_array($column))
-		{
-			foreach ($column as $key => $val)
-			{
-				if (is_numeric($key))
-				{
-					$key = $val;
-					$val = null;
-				}
-
-				$this->orderBy[] = array(
-					'column' => $key,
-					'direction' => $val,
-				);
-			}
-		}
-		else
+		if ( ! is_array($column))
 		{
 			$this->orderBy[] = array(
 				'column' => $column,
 				'direction' => $direction,
+			);
+
+			return $this;
+		}
+
+		foreach ($column as $key => $val)
+		{
+			if (is_numeric($key))
+			{
+				$key = $val;
+				$val = null;
+			}
+
+			$this->orderBy[] = array(
+				'column' => $key,
+				'direction' => $val,
 			);
 		}
 

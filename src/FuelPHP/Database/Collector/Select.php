@@ -12,6 +12,7 @@
 namespace FuelPHP\Database\Collector;
 
 use FuelPHP\Database\DB;
+use FuelPHP\Database\Exception;
 
 class Select extends Where
 {
@@ -60,13 +61,12 @@ class Select extends Where
 	 *
 	 * @param  array  $columns  an array of columns to select
 	 */
-	public function __construct($column = null)
+	public function __construct()
 	{
-		$columns = func_get_args();
 
-		if (count($columns))
+		if (func_num_args() > 0)
 		{
-			$this->columns = $columns;
+			$this->columns = func_get_args();
 		}
 	}
 
@@ -93,7 +93,7 @@ class Select extends Where
 	 * @param   ...
 	 * @return  $this
 	 */
-	public function select($column = null)
+	public function select($column)
 	{
 		$this->columns = array_merge($this->columns, func_get_args());
 
@@ -118,9 +118,9 @@ class Select extends Where
 	 * @param   array  $columns  list of column names or aliases
 	 * @return  object current instance
 	 */
-	public function selectArray(array $columns = array())
+	public function selectArray(array $columns)
 	{
-		! empty($columns) and $this->columns = array_merge($this->columns, $columns);
+		$this->columns = array_merge($this->columns, $columns);
 
 		return $this;
 	}
@@ -148,8 +148,7 @@ class Select extends Where
 	public function groupBy($columns)
 	{
 		$columns = func_get_args();
-
-		$this->groupBy = array_merge($this->groupBy, $columns);
+		$this->groupBy = array_unique(array_merge($this->groupBy, $columns));
 
 		return $this;
 	}
@@ -178,7 +177,7 @@ class Select extends Where
 	 */
 	public function on($column1, $op, $column2 = null)
 	{
-		if( ! $this->_lastJoin)
+		if ( ! $this->_lastJoin)
 		{
 			throw new Exception('You must first join a table before setting an "ON" clause.');
 		}
@@ -198,7 +197,7 @@ class Select extends Where
 	 */
 	public function andOn($column1, $op, $column2 = null)
 	{
-		if( ! $this->_lastJoin)
+		if ( ! $this->_lastJoin)
 		{
 			throw new Exception('You must first join a table before setting an "AND ON" clause.');
 		}
@@ -278,7 +277,7 @@ class Select extends Where
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_having('and', $column, $op, $value);
+		return $this->addCondition('having', 'and', $column, $op, $value);
 	}
 
 	/**
@@ -305,7 +304,7 @@ class Select extends Where
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_having('and', $column, $op, $value, true);
+		return $this->addCondition('having', 'and', $column, $op, $value, true);
 	}
 
 	/**
@@ -332,7 +331,7 @@ class Select extends Where
 			$op = is_array($value) ? 'in' : '=';
 		}
 
-		return $this->_having('or', $column, $op, $value);
+		return $this->addCondition('having', 'or', $column, $op, $value);
 	}
 
 	/**
@@ -359,7 +358,7 @@ class Select extends Where
 			$op = '=';
 		}
 
-		return $this->_having('or', $column, $op, $value, true);
+		return $this->addCondition('having', 'or', $column, $op, $value, true);
 	}
 
 	/**
@@ -517,72 +516,5 @@ class Select extends Where
 	public function orNotHavingClose()
 	{
 		return $this->havingClose();
-	}
-
-	/**
-	 * Adds an 'and having' statement to the query
-	 *
-	 *
-	 * @param   mixed    $column  array of 'and having' statements or column name
-	 * @param   string   $op      having logic operator
-	 * @param   mixed    $value   having value
-	 * @param   boolean  $not     wether to use NOT
-	 * @return  $this
-	 */
-	protected function _having($type, $column, $op, $value, $not = false)
-	{
-		if (is_array($column) and $op = null and $value = null)
-		{
-			foreach ($column as $key => $val)
-			{
-				if (is_array($val))
-				{
-					$numArgs = count($val);
-
-					if ($numArgs === 2)
-					{
-						$this->having[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' => '=',
-							'value' => $val[1],
-							'not' => false,
-						);
-					}
-					elseif ($numArgs === 3)
-					{
-						$this->having[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' =>  $val[1],
-							'value' => $val[1],
-							'not' => false,
-						);
-					}
-					else
-					{
-						$this->having[] = array(
-							'type' => $type,
-							'field' => $val[0],
-							'op' => $val[1],
-							'value' => $val[2],
-							'not' => $val[3]
-						);
-					}
-				}
-			}
-		}
-		else
-		{
-			$this->having[] = array(
-				'type' => $type,
-				'field' => $column,
-				'op' => $op,
-				'value' => $value,
-				'not' => $not,
-			);
-		}
-
-		return $this;
 	}
 }

@@ -22,8 +22,8 @@ class Mysql extends Compiler
 
 	public function compileCommandConcat($params)
 	{
-		$params = $this->quote($params);
+		$params = array_map(array($this, 'quoteIdentifier'), $params);
 
-		return 'CONCAT('.$params.')';
+		return 'CONCAT('.implode(', ', $params).')';
 	}
 }

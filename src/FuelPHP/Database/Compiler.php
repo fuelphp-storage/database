@@ -65,12 +65,6 @@ abstract class Compiler
 	public function compile($collector)
 	{
 		$type = strtolower($collector->type);
-
-		if ( ! isset($this->queryPartials[$type]))
-		{
-			throw new Exception('Query type "'.$type.'" can not be compiled.');
-		}
-
 		$partials = $this->queryPartials[$type];
 		$sql = array();
 
@@ -107,7 +101,7 @@ abstract class Compiler
 	 */
 	public function compileCommandConcat($params)
 	{
-		$params = array_map(array($this, 'quote'), $param);
+		$params = array_map(array($this, 'quoteIdentifier'), $params);
 
 		return implode(' || ', $params);
 	}
@@ -163,7 +157,14 @@ abstract class Compiler
 			$columns = $this->compileIdentifiers((array) $collector->columns);
 		}
 
-		return 'SELECT '.$columns;
+		$sql = 'SELECT ';
+
+		if ($collector->distinct)
+		{
+			$sql .= 'DISTINCT ';
+		}
+
+		return $sql.$columns;
 	}
 
 	/**
@@ -306,7 +307,7 @@ abstract class Compiler
 		{
 			$callback = array($this, 'quoteIdentifier');
 
-			return ' GROUP BY '.implode(', ', array_map($callback, $collector->groupBy));
+			return 'GROUP BY '.implode(', ', array_map($callback, $collector->groupBy));
 		}
 	}
 
@@ -389,7 +390,7 @@ abstract class Compiler
 			}
 
 			// Quote the table name that is being joined
-			$sql .= ' '.$this->quoteIdentifier($join['table']).' ON ';
+			$sql .= ' '.$this->quoteIdentifier($join->table).' ON ';
 
 			$on_sql = '';
 			foreach ($join->on as $condition)
@@ -449,7 +450,7 @@ abstract class Compiler
 						if ($useNot)
 						{
 							array_pop($parts);
-							$parts[] = ' NOT ';
+							$parts[] = 'NOT ';
 						}
 					}
 
@@ -472,7 +473,7 @@ abstract class Compiler
 				if ($useNot)
 				{
 					array_pop($parts);
-					$parts[] = ' NOT ';
+					$parts[] = 'NOT ';
 				}
 			}
 
@@ -526,9 +527,15 @@ abstract class Compiler
 	 */
 	public function quote($value)
 	{
-		if ($value === null or $value === '?')
+
+		if ($value === '?')
 		{
 			return $value;
+		}
+
+		elseif ($value === null)
+		{
+			return 'NULL';
 		}
 
 		elseif (is_bool($value))
@@ -560,13 +567,18 @@ abstract class Compiler
 			return $value;
 		}
 
+		elseif (is_double($value))
+		{
+			return $value;
+		}
+
 		elseif (is_float($value))
 		{
-			// Convert to non-locale aware float to prevent possible commas
+			// Convert to non-locale aware d to prevent possible commas
 			return sprintf('%F', $value);
 		}
 
-		return $this->connection->quote((string) $value);
+		return $this->connection->quote($value);
 	}
 
 	/**
@@ -577,22 +589,22 @@ abstract class Compiler
 	 */
 	public function quoteIdentifier($value)
 	{
-		if ($value === '?' or $value === '*')
+		if ($value === '*')
 		{
-			return $value;
+			return '*';
 		}
 
 		// Compile a subquery
 		if ($value instanceof Query)
 		{
-			return '('.$value->compile($this).')';
+			return '('.$value->getQuery($this).')';
 		}
 
 		// Compile an expression
 		elseif ($value instanceof Expression)
 		{
 			// Use a raw expression
-			return $value->handle($this->compiler);
+			return $value->getValue($this->connection);
 		}
 
 		// Compile an alias
@@ -600,6 +612,7 @@ abstract class Compiler
 		{
 			// Separate the column and alias
 			list ($_value, $alias) = $value;
+
 			return $this->quoteIdentifier($_value).' AS '.$this->quoteIdentifier($alias);
 		}
 
