@@ -49,7 +49,7 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 	public function testGetSupportClasses()
 	{
 		$connection = DB::connection(array(
-			'dns' => 'mysql:',
+			'dsn' => 'mysql:',
 		));
 		$this->assertInstanceOf('FuelPHP\Database\Compiler', $connection->getCompiler());
 		$this->assertInstanceOf('Doctrine\DBAL\Schema\AbstractSchemaManager', $connection->getDoctrineSchema());
@@ -70,10 +70,10 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 	/**
 	 * @expectedException  PDOException
 	 */
-	public function testInvalidDns()
+	public function testInvalidDsn()
 	{
 		DB::connection(array(
-			'dns' => 'mysq:siodhv',
+			'dsn' => 'mysq:siodhv',
 		))->connect();
 	}
 
