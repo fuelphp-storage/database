@@ -35,7 +35,7 @@ abstract class Connection implements LoggerAwareInterface
 		'resultCollection'  => null,
 		'connection'        => null,
 		'autoConnect'       => true,
-		'dns'               => false,
+		'dsn'               => false,
 		'username'          => '',
 		'password'          => '',
 		'port'              => null,
@@ -51,9 +51,9 @@ abstract class Connection implements LoggerAwareInterface
 	);
 
 	/**
-	 * @var  array  $dnsParts  dns partials
+	 * @var  array  $dsnParts  dsn partials
 	 */
-	protected $dnsParts = array(
+	protected $dsnParts = array(
 		'host'   => 'host',
 		'dbname' => 'database',
 		'port'   => 'port',
@@ -206,19 +206,19 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	public function connect()
 	{
-		$dns = $this->getDns();
+		$dsn = $this->getDsn();
 
 		try
 		{
-			$pdo = new PDO($dns,
+			$pdo = new PDO($dsn,
 				$this->config['username'],
 				$this->config['password'],
 				$this->config['attributes']);
 		}
 		catch (PDOException $e)
 		{
-			$this->log('critical', 'Cloud not connect to database with DNS: {dns}.', array(
-				'dns' => $dns,
+			$this->log('critical', 'Cloud not connect to database with DSN: {dsn}.', array(
+				'dsn' => $dsn,
 				'exception' => $e,
 			));
 
@@ -283,26 +283,26 @@ abstract class Connection implements LoggerAwareInterface
 	}
 
 	/**
-	 * Retrieve the dns from config
+	 * Retrieve the dsn from config
 	 *
-	 * @return  string  dns string
+	 * @return  string  dsn string
 	 */
-	public function getDns()
+	public function getDsn()
 	{
-		if ($this->config['dns'])
+		if ($this->config['dsn'])
 		{
-			return $this->config['dns'];
+			return $this->config['dsn'];
 		}
 
-		$dns = $this->driver.':';
+		$dsn = $this->driver.':';
 
-		foreach ($this->dnsParts as $name => $key)
+		foreach ($this->dsnParts as $name => $key)
 		{
 			if (isset($this->config[$key]))
-				$dns .= $name.'='.$this->config[$key].';';
+				$dsn .= $name.'='.$this->config[$key].';';
 		}
 
-		return $dns;
+		return $dsn;
 	}
 
 	/**
