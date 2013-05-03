@@ -189,7 +189,7 @@ abstract class Connection implements LoggerAwareInterface
 	 *
 	 * @return   \Doctrine\DBAL\Schema\AbstractSchemaManager
 	 */
-	public function getDoctrineSchema()
+	public function getSchemaManager()
 	{
 		$connection = DoctrineManager::getConnection(array(
 			'pdo' => $this->getPdo(),

@@ -52,7 +52,7 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 			'dsn' => 'mysql:',
 		));
 		$this->assertInstanceOf('FuelPHP\Database\Compiler', $connection->getCompiler());
-		$this->assertInstanceOf('Doctrine\DBAL\Schema\AbstractSchemaManager', $connection->getDoctrineSchema());
+		$this->assertInstanceOf('Doctrine\DBAL\Schema\AbstractSchemaManager', $connection->getSchemaManager());
 		$this->assertInstanceOf('FuelPHP\Database\Query', $connection->query('Statement'));
 		$this->assertInstanceOf('FuelPHP\Database\Schema', $connection->getSchema());
 		$this->assertInstanceOf('FuelPHP\Database\Collector\Select', $connection->select('Statement'));

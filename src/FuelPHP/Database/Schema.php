@@ -24,6 +24,12 @@ class Schema
 	 */
 	protected $connection;
 
+	protected $platform;
+
+	protected $manager;
+
+	protected $schema;
+
 	/**
 	 * Constructor
 	 *
@@ -34,21 +40,56 @@ class Schema
 		$this->connection = $connection;
 	}
 
+	/**
+	 * Get the Doctrine Platform instance
+	 *
+	 * @return  Doctrine\DBAL\Platforms\AbstractPlatform
+	 */
 	public function getPlatform()
 	{
-		return $this->getSchemaManager()->getDatabasePlatform();
+		if ( ! $this->platform)
+		{
+			$this->platform = $this->getSchemaManager()->getDatabasePlatform();
+		}
+
+		return $this->platform;
 	}
 
+	/**
+	 * Get the Doctrine Schema Manager
+	 *
+	 * @return  Doctrine\DBAL\Schema\AbstractSchemaManager
+	 */
 	public function getSchemaManager()
 	{
-		return $this->connection->getDoctrineSchema();
+		if ( ! $this->manager)
+		{
+			$this->manager = $this->connection->getSchemaManager();
+		}
+		return $this->manager;
 	}
 
+	/**
+	 * Get the Doctrine Schema
+	 *
+	 * @return  Doctrine\DBAL\Schema\Schema
+	 */
 	public function getSchema()
 	{
-		return $this->getSchemaManager()->createSchema();
+		if ( ! $this->schema)
+		{
+			$this->schema = $this->getSchemaManager()->createSchema();
+		}
+
+		return $this->schema;
 	}
 
+	/**
+	 * Alter a table
+	 *
+	 * @param   string   $table   table name
+	 * @param   Closure  $config  configuration callback
+	 */
 	public function alterTable($table, Closure $config)
 	{
 		$schema = $this->getSchema();
@@ -57,25 +98,30 @@ class Schema
 		$config($table);
 		$comparator = new DoctrineComparator;
 		$diff = $comparator->compare($schema, $newSchema);
-
-		return (array) $diff->toSql($this->getPlatform());
+		$commands = (array) $diff->toSql($this->getPlatform());
+		$this->runCommands($commands);
 	}
 
-	public function renameTable($from, $to)
-	{
-		$schema = $this->getSchema();
-		$from = $schema->getTable($from);
-	}
-
+	/**
+	 * Create a table
+	 *
+	 * @param   string   $table   table name
+	 * @param   Closure  $config  configuration callback
+	 */
 	public function createTable($table, Closure $config)
 	{
 		$schema = new DoctrineSchema;
 		$table = new Schema\Table($schema->createTable($table), $schema);
 		$config($table);
-
-		return (array) $schema->toSql($this->getPlatform());
+		$commands = (array) $schema->toSql($this->getPlatform());
+		$this->runCommands($commands);
 	}
 
+	/**
+	 * Drop a table
+	 *
+	 * @param   string   $table   table name
+	 */
 	public function dropTable($table)
 	{
 		$schema = $this->getSchema();
@@ -83,19 +129,20 @@ class Schema
 		$table = $schema->dropTable($table);
 		$comparator = new DoctrineComparator;
 		$diff = $comparator->compare($old, $schema);
-
-		return (array) $diff->toSql($this->getPlatform());
+		$commands = (array) $diff->toSql($this->getPlatform());
+		$this->runCommands($commands);
 	}
 
+	/**
+	 * Get table details
+	 *
+	 * @param   string  $table  table name
+	 * @return  Doctrine\DBAL\Schema\Table
+	 */
 	public function tableDetails($table)
 	{
 		$schema = $this->getSchemaManager();
 
 		return $schema->listTableDetails($table);
-	}
-
-	public function store()
-	{
-		return serialize($this->getSchema());
 	}
 }
