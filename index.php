@@ -31,7 +31,7 @@ class Dummy
 };
 
 $connection = DB::connection(array(
-	'driver' => 'pgsql',
+	'driver' => 'mysql',
 	'username' => 'root',
 	'password' => 'root',
 	'database' => 'ku_cms',

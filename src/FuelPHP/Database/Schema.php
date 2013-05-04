@@ -84,6 +84,18 @@ class Schema
 		return $this->schema;
 	}
 
+	public function getTable($table)
+	{
+		$schema = $this->getSchema();
+
+		return new Schema\Table($schema->getTable($table));
+	}
+
+	public function getColumn($table, $column)
+	{
+		return $this->getTable($table)->getColumn($column);
+	}
+
 	/**
 	 * Alter a table
 	 *
@@ -131,6 +143,49 @@ class Schema
 		$diff = $comparator->compare($old, $schema);
 		$commands = (array) $diff->toSql($this->getPlatform());
 		$this->runCommands($commands);
+	}
+
+	public function hasTable($table)
+	{
+		$tables = $this->listTableNames();
+
+		return in_array($table, $tables);
+	}
+
+	public function listTableNames()
+	{
+		return $this->getSchemaManager()->listTableNames();
+	}
+
+	public function hasColumn($table, $column)
+	{
+		$columns = $this->listColumnNames($table);
+
+		return in_array($column, $columns);
+	}
+
+	public function listColumnNames($table)
+	{
+		return array_map(function($column)
+		{
+			return $column->getName();
+		},
+		$this->listColumns($table));
+	}
+
+	public function listColumns($table)
+	{
+		return $this->getSchemaManager()->listTableColumns($table);
+	}
+
+	public function runCommands(array $commands)
+	{
+		foreach ($commands as $command)
+		{
+			$this->connection->execute(DB::PLAIN, $command);
+		}
+
+		$this->schema = null;
 	}
 
 	/**

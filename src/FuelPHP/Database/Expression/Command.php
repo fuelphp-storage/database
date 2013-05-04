@@ -39,7 +39,7 @@ class Command extends Expression
 	public function __construct($value)
 	{
 		$arguments = func_get_args();
-		$this->command = array_pop($arguments);
+		$this->command = array_shift($arguments);
 		$this->arguments = $arguments;
 	}
 

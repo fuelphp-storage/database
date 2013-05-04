@@ -278,6 +278,7 @@ class Where extends Collector
 	{
 		$this->where[] = array(
 			'nesting' => 'close',
+			'type' => 'and',
 		);
 
 		return $this;
@@ -425,6 +426,7 @@ class Where extends Collector
 	protected function addCondition($stack, $type, $column, $op, $value, $not = false)
 	{
 		$this->{$stack}[] = array(
+			// 'nesting' => false,
 			'type' => $type,
 			'field' => $column,
 			'op' => $op,

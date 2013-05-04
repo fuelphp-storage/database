@@ -77,9 +77,19 @@ class SelectTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $select->getQuery());
 
 		$select->where(function($query){
+			$query->where(function($query){
 				$query->where('between', 'between', array(1,3));
 			});
-		$expected .= ' WHERE (`between` BETWEEN 1 AND 3)';
+		});
+		$expected .= ' WHERE ((`between` BETWEEN 1 AND 3))';
+		$this->assertEquals($expected, $select->getQuery());
+
+		$select->where(function($query){
+			$query->notWhere(function($query){
+				$query->where('between', 'between', array(1,3));
+			});
+		});
+		$expected .= ' AND (NOT (`between` BETWEEN 1 AND 3))';
 		$this->assertEquals($expected, $select->getQuery());
 
 		$select->andWhere('num', '=', null);

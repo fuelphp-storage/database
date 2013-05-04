@@ -429,7 +429,7 @@ abstract class Compiler
 
 		foreach ($conditions as $c)
 		{
-			if (isset($c['type']) and count($parts) > 0)
+			if ( ! empty($parts) and $last !== '(')
 			{
 				$parts[] = ' '.strtoupper($c['type']).' ';
 			}
@@ -443,38 +443,24 @@ abstract class Compiler
 			{
 				if ($c['nesting'] === 'open')
 				{
-					if ($last === '(')
-					{
-						array_pop($parts);
-
-						if ($useNot)
-						{
-							array_pop($parts);
-							$parts[] = 'NOT ';
-						}
-					}
-
 					$last = '(';
 					$parts[] = '(';
 				}
 				else
 				{
+					array_pop($parts);
+
+					if ($useNot)
+					{
+						array_pop($parts);
+						$parts[] = ' NOT ';
+					}
+
 					$last = ')';
 					$parts[] = ')';
 				}
 
 				continue;
-			}
-
-			if($last === '(')
-			{
-				array_pop($parts);
-
-				if ($useNot)
-				{
-					array_pop($parts);
-					$parts[] = 'NOT ';
-				}
 			}
 
 			$last = false;
@@ -578,7 +564,7 @@ abstract class Compiler
 			return sprintf('%F', $value);
 		}
 
-		return $this->connection->quote($value);
+		return $this->connection->getPdo()->quote($value);
 	}
 
 	/**

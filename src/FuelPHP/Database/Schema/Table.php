@@ -38,7 +38,6 @@ class Table
 		return new Column($column, $this);
 	}
 
-
 	public function string($name, $length = null, $default = null)
 	{
 		return $this->add($name, 'string', compact('length', 'default'));
@@ -49,11 +48,21 @@ class Table
 		return $this->add($name, 'integer', compact('length', 'default'));
 	}
 
+	public function increment($name, $length = null)
+	{
+		return $this->integer($name, $length)->increment();
+	}
+
 	public function drop($column)
 	{
 		$this->table->dropColumn($column);
 
 		return $this;
+	}
+
+	public function text($name, $default = null, $length = 65532)
+	{
+		return $this->add($name, 'text', compact('default', 'length'));
 	}
 
 	public function boolean($name, $default = false)
@@ -63,17 +72,17 @@ class Table
 
 	public function bool($name, $default = false)
 	{
-		return $this->boolean($name, $defaut);
+		return $this->boolean($name, $default);
 	}
 
 	public function decimal($name, $precision, $scale, $default = null)
 	{
-		return $this->add('decimal', $name, compact('precision', 'scale', 'default'));
+		return $this->add($name, 'decimal', compact('precision', 'scale', 'default'));
 	}
 
 	public function float($name, $precision, $scale, $default = null)
 	{
-		return $this->add('float', $name, compact('precision', 'scale', 'default'));
+		return $this->add($name, 'float', compact('precision', 'scale', 'default'));
 	}
 
 	/**
@@ -194,6 +203,13 @@ class Table
 	public function unique($fields, $name)
 	{
 		$this->table->addUniqueIndex((array) $fields, $name);
+
+		return $this;
+	}
+
+	public function primary($fields)
+	{
+		$this->table->setPrimaryKey((array) $fields);
 
 		return $this;
 	}

@@ -72,8 +72,9 @@ class Column
 	 */
 	public function primary()
 	{
-		$column = (array) $this->column->getName();
-		$this->table->setPrimaryKey($column);
+		$column = $this->column->getName();
+
+		$this->table->primary($column);
 
 		return $this;
 	}
@@ -92,9 +93,32 @@ class Column
 		{
 			$name = $column.'_unique';
 		}
+
 		$columns = (array) $column;
 
-		$this->table->addUniqueIndex($columns, $name);
+		$this->table->unique($columns, $name);
+
+		return $this;
+	}
+
+	/**
+	 * Adds the column as a unique index
+	 *
+	 * @param   string  $name  index name
+	 * @return  $this
+	 */
+	public function index($name = null)
+	{
+		$column = $this->column->getName();
+
+		if ( ! $name)
+		{
+			$name = $column.'_index';
+		}
+
+		$columns = (array) $column;
+
+		$this->table->index($columns, $name);
 
 		return $this;
 	}
@@ -120,7 +144,7 @@ class Column
 	{
 		if ( ! method_exists($this->column, $method) and ! method_exists($this->column, $method = 'set'.ucfirst($method)))
 		{
-			throw new \BadMethodCallException('Call to undefined function '.get_class($this).'::'.$method);
+			throw new \BadMethodCallException('Call to undefined function '.get_class($this).'::'.func_get_arg(0));
 		}
 
 		$result = call_user_func_array(array($this->column, $method), $arguments);

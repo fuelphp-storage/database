@@ -313,7 +313,7 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	public function quote($value)
 	{
-		return $this->getPdo()->quote($value);
+		return $this->getCompiler()->quote($value);
 	}
 
 	/**
