@@ -11,7 +11,7 @@ class Table
 	/**
 	 * @var  \Doctrine\DBAL\Schema\Table  $table
 	 */
-	protected $table;
+	public $table;
 
 	/**
 	 * Constructor
@@ -38,21 +38,50 @@ class Table
 		return new Column($column, $this);
 	}
 
+	/**
+	 * Add a string column
+	 *
+	 * @param   string   $name     column name
+	 * @param   integer  $length   length
+	 * @param   string   $default  default value
+	 * @return  Column  wrapped column
+	 */
 	public function string($name, $length = null, $default = null)
 	{
 		return $this->add($name, 'string', compact('length', 'default'));
 	}
 
+	/**
+	 * Add an integer column
+	 *
+	 * @param   string   $name     column name
+	 * @param   integer  $length   length
+	 * @param   integer  $default  default value
+	 * @return  Column  wrapped column
+	 */
 	public function integer($name, $length = null, $default = null)
 	{
 		return $this->add($name, 'integer', compact('length', 'default'));
 	}
 
+	/**
+	 * Add an incremental column
+	 *
+	 * @param   string   $name     column name
+	 * @param   integer  $length   length
+	 * @return  Column  wrapped column
+	 */
 	public function increment($name, $length = null)
 	{
 		return $this->integer($name, $length)->increment();
 	}
 
+	/**
+	 * Drop a column
+	 *
+	 * @param   string   $name     column name
+	 * @return  $this
+	 */
 	public function drop($column)
 	{
 		$this->table->dropColumn($column);
@@ -60,26 +89,66 @@ class Table
 		return $this;
 	}
 
+	/**
+	 * Add an text column
+	 *
+	 * @param   string   $name     column name
+	 * @param   string   $default  default
+	 * @param   integer  $length   length
+	 * @return  Column  wrapped column
+	 */
 	public function text($name, $default = null, $length = 65532)
 	{
 		return $this->add($name, 'text', compact('default', 'length'));
 	}
 
+	/**
+	 * Add an boolean column
+	 *
+	 * @param   string   $name     column name
+	 * @param   boolean  $default  default
+	 * @return  Column  wrapped column
+	 */
 	public function boolean($name, $default = false)
 	{
 		return $this->add($name, 'boolean', compact('default'));
 	}
 
+	/**
+	 * Add an boolean column
+	 *
+	 * @param   string   $name     column name
+	 * @param   boolean  $default  default
+	 * @return  Column  wrapped column
+	 */
 	public function bool($name, $default = false)
 	{
 		return $this->boolean($name, $default);
 	}
 
+	/**
+	 * Add an decimal column
+	 *
+	 * @param   string   $name       column name
+	 * @param   string   $precision  precision
+	 * @param   string   $scale      scale
+	 * @param   decimal  $default    default
+	 * @return  Column  wrapped column
+	 */
 	public function decimal($name, $precision, $scale, $default = null)
 	{
 		return $this->add($name, 'decimal', compact('precision', 'scale', 'default'));
 	}
 
+	/**
+	 * Add an float column
+	 *
+	 * @param   string   $name       column name
+	 * @param   string   $precision  precision
+	 * @param   string   $scale      scale
+	 * @param   decimal  $default    default
+	 * @return  Column  wrapped column
+	 */
 	public function float($name, $precision, $scale, $default = null)
 	{
 		return $this->add($name, 'float', compact('precision', 'scale', 'default'));
@@ -89,7 +158,7 @@ class Table
 	 * Return a column to be modified
 	 *
 	 * @param   string  $name  column name
-	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 * @return  Column  wrapped column
 	 */
 	public function change($name)
 	{
@@ -101,7 +170,7 @@ class Table
 	 *
 	 * @param   string  $name  column name
 	 * @param   string  $as    new column name
-	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 * @return  Column  wrapped column
 	 */
 	public function copy($column, $as)
 	{
@@ -116,7 +185,7 @@ class Table
 	 *
 	 * @param   string  $from  column to copy
 	 * @param   string  $to    new column name
-	 * @return  \FuelPHP\Database\Schema\Column  wrapped column
+	 * @return  $this
 	 */
 	public function rename($from, $to)
 	{
@@ -129,7 +198,7 @@ class Table
 	 * Sets the engine option
 	 *
 	 * @param   string  $engine  engine
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function engine($engine)
 	{
@@ -142,7 +211,7 @@ class Table
 	 * Sets the charset option
 	 *
 	 * @param   string  $charset  charset
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function charset($charset)
 	{
@@ -155,7 +224,7 @@ class Table
 	 * Sets the collate option
 	 *
 	 * @param   string  $collate  collate
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function collate($collate)
 	{
@@ -169,12 +238,11 @@ class Table
 	 *
 	 * @param   string  $fields  fields
 	 * @param   string  $name    index name
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function index($fields, $name = null)
 	{
 		$fields = (array) $fields;
-
 		$this->table->addIndex($fields, $name);
 
 		return $this;
@@ -184,7 +252,7 @@ class Table
 	 * Drop an index
 	 *
 	 * @param   string  $name  index name
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function dropIndex($name)
 	{
@@ -198,7 +266,7 @@ class Table
 	 *
 	 * @param   string  $fields  fields
 	 * @param   string  $name    index name
-	 * @return  \FuelPHP\Database\Schema\Table  table
+	 * @return  $this
 	 */
 	public function unique($fields, $name)
 	{
@@ -207,6 +275,28 @@ class Table
 		return $this;
 	}
 
+	/**
+	 * Adds a fulltext index to the table
+	 *
+	 * @param   array   $fields  fields
+	 * @param   string  $name    index name
+	 * @return  $this
+	 */
+	public function fulltext($fields, $name)
+	{
+		$this->table->addIndex((array) $fields, $name);
+		$index = $this->table->getIndex($name);
+		$index->addFlag('fulltext');
+
+		return $this;
+	}
+
+	/**
+	 * Sets the primary field(s)
+	 *
+	 * @param   array|string  fieldname(s)
+	 * @return  $this
+	 */
 	public function primary($fields)
 	{
 		$this->table->setPrimaryKey((array) $fields);

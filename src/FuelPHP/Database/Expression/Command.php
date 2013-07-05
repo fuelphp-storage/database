@@ -68,7 +68,7 @@ class Command extends Expression
 
 		if (method_exists($compiler, $method = 'compileCommand'.ucfirst($this->command)))
 		{
-			return call_user_func_array(array($compiler, $method), $this->arguments);
+			return call_user_func(array($compiler, $method), $this->arguments);
 		}
 
 		$command = strtoupper($this->command);

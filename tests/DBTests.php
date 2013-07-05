@@ -166,6 +166,58 @@ class DBTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($result, $expression->getValue($connection));
 	}
 
+	public function testExprConcat()
+	{
+		$pdo = M::mock('stdclass');
+		$expression = DB::command('concat', 'some', 'fields');
+		$connection = DB::connection(array(
+			'pdo' => $pdo,
+			'driver' => 'pgsql',
+		));
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('"some" || "fields"', $sql);
+	}
+
+	public function testExprWhen()
+	{
+		$expression = DB::when('field');
+		$expression->is('this', 'that');
+		$expression->is('what', 'oink');
+		$expression->orElse('no');
+		$pdo = M::mock('stdclass');
+		$connection = DB::connection(array(
+			'pdo' => $pdo
+		));
+		$pdo->shouldReceive('quote')->andReturnUsing(function($value) {
+			return '"'.$value.'"';
+		});
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('CASE `field` WHEN "this" THEN "that" WHEN "what" THEN "oink" ELSE "no" END', $sql);
+	}
+
+	public function testExprMatch()
+	{
+		$expression = DB::match('age')->against('this');
+		$pdo = M::mock('stdclass');
+		$connection = DB::connection(array(
+			'pdo' => $pdo
+		));
+		$pdo->shouldReceive('quote')->andReturnUsing(function($value) {
+			return '"'.$value.'"';
+		});
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('MATCH (`age`) AGAINST ("this")', $sql);
+		$expression->boolean();
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('MATCH (`age`) AGAINST ("this" IN BOOLEAN MODE)', $sql);
+		$expression->expand();
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('MATCH (`age`) AGAINST ("this" WITH QUERY EXPANSION)', $sql);
+		$expression->boolean();
+		$sql = $expression->getValue($connection);
+		$this->assertEquals('MATCH (`age`) AGAINST ("this" IN BOOLEAN MODE)', $sql);
+	}
+
 	/**
      * @dataProvider factoryProvider
      */

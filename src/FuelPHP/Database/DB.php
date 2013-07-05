@@ -58,10 +58,32 @@ class DB
 	}
 
 	/**
+	 * Database case shortcut.
+	 *
+	 * @param   string  $case
+	 * @return  object  a new FuelPHP\Database\Expression\Case object.
+	 */
+	public static function when($case)
+	{
+		return new Expression\When($case);
+	}
+
+	/**
+	 * Database match shortcut.
+	 *
+	 * @param   string  $fields
+	 * @return  object  a new FuelPHP\Database\Expression\Match object.
+	 */
+	public static function match($fields)
+	{
+		return new Expression\Match($fields);
+	}
+
+	/**
 	 * Database value shortcut.
 	 *
 	 * @param   mixed   $value  value
-	 * @return  object  a new FuelPHP\Database\Value object.
+	 * @return  object  a new FuelPHP\Database\Expression\Value object.
 	 */
 	public static function value($value)
 	{
@@ -72,7 +94,7 @@ class DB
 	 * Database parameter shortcut.
 	 *
 	 * @param   mixed   $param  param
-	 * @return  object  a new FuelPHP\Database\Parameter object.
+	 * @return  object  a new FuelPHP\Database\Expression\Parameter object.
 	 */
 	public static function param($param)
 	{
@@ -83,7 +105,7 @@ class DB
 	 * Database parameter shortcut.
 	 *
 	 * @param   mixed   $param  param
-	 * @return  object  a new FuelPHP\Database\Parameter object.
+	 * @return  object  a new FuelPHP\Database\Expression\Increment object.
 	 */
 	public static function increment($field, $amount = 1)
 	{
@@ -97,7 +119,7 @@ class DB
 	 * Database identifier shortcut.
 	 *
 	 * @param   mixed   $identifier  identifier
-	 * @return  object  a new FuelPHP\Database\Value object.
+	 * @return  object  a new FuelPHP\Database\Expression\Identifier object.
 	 */
 	public static function identifier($identifier)
 	{
@@ -109,7 +131,7 @@ class DB
 	 *
 	 * @param   string  $fn      command
 	 * @param   array   $params  arguments
-	 * @return  object  a new FuelPHP\Database\Fn object.
+	 * @return  object  a new FuelPHP\Database\Expression\Command object.
 	 */
 	public static function command($command)
 	{

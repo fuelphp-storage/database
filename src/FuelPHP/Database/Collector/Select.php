@@ -63,11 +63,6 @@ class Select extends Where
 	 */
 	public function __construct()
 	{
-
-		if (func_num_args() > 0)
-		{
-			$this->columns = func_get_args();
-		}
 	}
 
 	/**
@@ -96,18 +91,6 @@ class Select extends Where
 	public function select($column)
 	{
 		$this->columns = array_merge($this->columns, func_get_args());
-
-		return $this;
-	}
-
-	/**
-	 * Empty the select array
-	 *
-	 * @return  $this
-	 */
-	public function resetSelect()
-	{
-		$this->columns = array();
 
 		return $this;
 	}

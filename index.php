@@ -38,7 +38,7 @@ $connection = DB::connection(array(
 	'persistant' => false,
 ));
 
-$select = $connection->select()
+$select = $connection->select(DB::when('thing')->is(1, 2)->is(3, 4))
 	->from('table')
 	->where('a', 'b')
 	->orWhere('b', 1)

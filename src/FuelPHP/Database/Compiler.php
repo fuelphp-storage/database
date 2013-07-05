@@ -12,6 +12,7 @@
 namespace FuelPHP\Database;
 
 use FuelPHP\Database\Expression;
+use FuelPHP\Database\Expression\When;
 
 abstract class Compiler
 {
@@ -91,6 +92,24 @@ abstract class Compiler
 		$modifier = $amount > 0 ? ' + ' : ' - ';
 
 		return $this->quoteIdentifier($field).$modifier.$amount;
+	}
+
+	/**
+	 * Compile a CASE statement
+	 *
+	 * @param   Expression\When  $case
+	 * @return  string  case sql
+	 */
+	public function compileCase(When $case)
+	{
+		$sql = 'CASE '.$this->quoteIdentifier($case->value);
+
+		foreach($case->when as $when)
+		{
+			$sql .= ' WHEN '.$this->quote($when['value']).' THEN '.$this->quote($when['then']);
+		}
+
+		return $sql.' ELSE '.$this->quote($case->orElse).' END';
 	}
 
 	/**

@@ -74,7 +74,7 @@ class Query implements ConnectionAwareInterface
 	 * @param  string  $query  query
 	 * @param  const   $type   query type
 	 */
-	public function __construct($query, $type = DB::PLAIN)
+	public function __construct($query = null, $type = DB::PLAIN)
 	{
 		$this->query = $query;
 		$this->type = $type;

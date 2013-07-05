@@ -93,8 +93,10 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			$table->decimal('decim', 1,1);
 			$table->float('floa', 1,1);
 			$table->engine('InnoDB')->charset('utf8')->collate('utf8_general_ci');
+			$table->fulltext(array('name', 'surname', 'id'), 'name_fulltext');
 		});
 
+		$this->assertTrue($schema->getTable('test_table')->hasIndex('name_fulltext'));
 		$this->assertTrue($schema->hasTable('test_table'));
 		$this->assertTrue($schema->hasColumn('test_table', 'id'));
 		$this->assertFalse($schema->hasColumn('test_table', 'uid'));

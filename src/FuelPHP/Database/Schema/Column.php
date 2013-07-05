@@ -9,12 +9,12 @@ class Column
 	/**
 	 * @var  \Doctrine\DBAL\Schema\Column  $column  doctrine column object
 	 */
-	protected $column;
+	public $column;
 
 	/**
 	 * @var  \FuelPHP\Database\Schema\Table  $table  table
 	 */
-	protected $table;
+	public $table;
 
 	/**
 	 * Constructor

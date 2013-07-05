@@ -1,6 +1,6 @@
 <?php
 
-include 'vendor/autoload.php';
+include './vendor/autoload.php';
 
 class_alias('Mockery', 'M');
 
