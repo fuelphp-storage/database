@@ -2,25 +2,6 @@
 
 class SchemaTests extends PHPUnit_Framework_TestCase
 {
-	// public function tearDown()
-	// {
-	// 	$connection = DB::connection(array(
-	// 		'database' => 'fuelphp_database_tests',
-	// 		'host' => 'localhost',
-	// 		'username' => 'root',
-	// 		'password' => 'root',
-	// 		'persistent' => true,
-	// 	));
-
-	// 	$schema = $connection->getSchema();
-
-	// 	try {
-	// 		$schema->dropTable('test_table');
-	// 	} catch(Exception $e) {
-	// 		// ignore this
-	// 	}
-	// }
-
 	public function testGetPlatform()
 	{
 		$connection = M::mock('FuelPHP\Database\Connection');
@@ -45,7 +26,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			'database' => 'fuelphp_database_tests',
 			'host' => 'localhost',
 			'username' => 'root',
-			'password' => '',
+			'password' => 'root',
 			'persistent' => true,
 		));
 

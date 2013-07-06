@@ -627,7 +627,12 @@ abstract class Compiler
 		if (strpos($value, '"') !== false)
 		{
 			// Quote the column in FUNC("ident") identifiers
-			return preg_replace_callback('/"(.+?)"/', array($this, 'quoteIdentifier'), $value);
+			$quoter = array($this, 'quoteIdentifier');
+			$callback = function ($matches) use ($quoter) {
+				return call_user_func($quoter, trim($matches[0], '"'));
+			};
+
+			return preg_replace_callback('/"(.+?)"/', $callback, $value);
 		}
 		elseif (strpos($value, '.') !== false)
 		{
