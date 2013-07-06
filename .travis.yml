@@ -8,7 +8,6 @@ php:
 before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev
-  - phpenv config-add travis.ini
   - mysql -e 'create database fuelphp_database_tests;'
 
 script: phpunit --coverage-text

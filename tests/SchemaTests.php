@@ -45,7 +45,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			'database' => 'fuelphp_database_tests',
 			'host' => 'localhost',
 			'username' => 'root',
-			'password' => getenv('fuel_test_password') ?: 'root',
+			'password' => '',
 			'persistent' => true,
 		));
 
