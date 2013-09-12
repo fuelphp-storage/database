@@ -172,7 +172,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  FuelPHP\Database\Exception
+	 * @expectedException  Fuel\Database\Exception
 	 */
 	public function testInvalidOn()
 	{
@@ -185,7 +185,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  FuelPHP\Database\Exception
+	 * @expectedException  Fuel\Database\Exception
 	 */
 	public function testInvalidAndOn()
 	{
@@ -198,7 +198,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  FuelPHP\Database\Exception
+	 * @expectedException  Fuel\Database\Exception
 	 */
 	public function testInvalidOrOn()
 	{

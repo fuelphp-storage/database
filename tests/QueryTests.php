@@ -92,8 +92,8 @@ class QueryTests extends PHPUnit_Framework_TestCase
 
 	public function testSetConnection()
 	{
-		$connection = M::mock('FuelPHP\Database\Connection');
-		$compiler = M::mock('FuelPHP\Database\Compiler');
+		$connection = M::mock('Fuel\Database\Connection');
+		$compiler = M::mock('Fuel\Database\Compiler');
 		$connection->shouldReceive('getCompiler')->once()->andReturn($compiler);
 		$query = new Query('STUFF');
 		$query->setConnection($connection);
@@ -136,14 +136,14 @@ class QueryTests extends PHPUnit_Framework_TestCase
 
 	public function testExecute()
 	{
-		$connection = M::mock('FuelPHP\Database\Connection');
+		$connection = M::mock('Fuel\Database\Connection');
 		$connection->shouldReceive('execute')->once()->andReturn('result');
 		$query = new Query('');
 		$this->assertEquals('result', $query->execute(array(), $connection));
 	}
 
 	/**
-	 * @expectedException FuelPHP\Database\Exception
+	 * @expectedException Fuel\Database\Exception
 	 */
 	public function testInvalidConnectionExecute()
 	{
@@ -152,7 +152,7 @@ class QueryTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException FuelPHP\Database\Exception
+	 * @expectedException Fuel\Database\Exception
 	 */
 	public function testNoConnection()
 	{

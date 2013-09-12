@@ -2,7 +2,7 @@
 
 include 'vendor/autoload.php';
 
-use FuelPHP\Database\DB;
+use Fuel\Database\DB;
 
 class Dummy
 {

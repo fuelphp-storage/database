@@ -4,7 +4,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 {
 	public function testGetPlatform()
 	{
-		$connection = M::mock('FuelPHP\Database\Connection');
+		$connection = M::mock('Fuel\Database\Connection');
 		$connection->shouldReceive('getSchemaManager')->andReturn(M::self());
 		$connection->shouldReceive('getDatabasePlatform')->andReturn('called');
 		$schema = new Schema($connection);
@@ -13,7 +13,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 
 	public function testGetSchema()
 	{
-		$connection = M::mock('FuelPHP\Database\Connection');
+		$connection = M::mock('Fuel\Database\Connection');
 		$connection->shouldReceive('getSchemaManager')->andReturn(M::self());
 		$connection->shouldReceive('createSchema')->andReturn('called');
 		$schema = new Schema($connection);
@@ -26,7 +26,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			'database' => 'fuelphp_database_tests',
 			'host' => 'localhost',
 			'username' => 'root',
-			'password' => '',
+			'password' => 'root',
 			'persistent' => true,
 		));
 
@@ -73,8 +73,8 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			$table->text('bio');
 			$table->decimal('decim', 1,1);
 			$table->float('floa', 1,1);
-			$table->engine('InnoDB')->charset('utf8')->collate('utf8_general_ci');
-			$table->fulltext(array('name', 'surname', 'id'), 'name_fulltext');
+			$table->engine('MyISAM')->charset('utf8')->collate('utf8_general_ci');
+			$table->fulltext(array('name', 'surname'), 'name_fulltext');
 		});
 
 		$this->assertTrue($schema->getTable('test_table')->hasIndex('name_fulltext'));

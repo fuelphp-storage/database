@@ -4,12 +4,12 @@ class DBTests extends PHPUnit_Framework_TestCase
 {
 	public function mockConnection()
 	{
-		return M::mock('FuelPHP\Database\Connection');
+		return M::mock('Fuel\Database\Connection');
 	}
 
 	public function mockCompiler()
 	{
-		return M::mock('FuelPHP\Database\Compiler');
+		return M::mock('Fuel\Database\Compiler');
 	}
 
 	public function expressionProvider()
@@ -56,37 +56,37 @@ class DBTests extends PHPUnit_Framework_TestCase
 			array(
 				'query',
 				array('SELECT * FROM `users`'),
-				'FuelPHP\Database\Query',
+				'Fuel\Database\Query',
 			),
 			array(
 				'connection',
 				array(array('autoConnect' => false, 'driver' => 'mysql')),
-				'FuelPHP\Database\Connection',
+				'Fuel\Database\Connection',
 			),
 			array(
 				'select',
 				array('something'),
-				'FuelPHP\Database\Collector\Select',
+				'Fuel\Database\Collector\Select',
 			),
 			array(
 				'selectArray',
 				array(array('something')),
-				'FuelPHP\Database\Collector\Select',
+				'Fuel\Database\Collector\Select',
 			),
 			array(
 				'update',
 				array('something'),
-				'FuelPHP\Database\Collector\Update',
+				'Fuel\Database\Collector\Update',
 			),
 			array(
 				'insert',
 				array('something'),
-				'FuelPHP\Database\Collector\Insert',
+				'Fuel\Database\Collector\Insert',
 			),
 			array(
 				'delete',
 				array('something'),
-				'FuelPHP\Database\Collector\Delete',
+				'Fuel\Database\Collector\Delete',
 			),
 		);
 	}
@@ -97,7 +97,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	public function testExpr($string, $connection)
 	{
 		$expression = DB::expr($string);
-		$this->assertInstanceOf('FuelPHP\Database\Expression', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression', $expression);
 		$this->assertEquals($string, $expression->getValue($connection));
 	}
 
@@ -108,7 +108,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	{
 		$expression = DB::value($string);
 		$connection->shouldReceive('quote')->with($string)->once()->andReturn($string);
-		$this->assertInstanceOf('FuelPHP\Database\Expression\Value', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression\Value', $expression);
 		$this->assertEquals($string, $expression->getValue($connection));
 	}
 
@@ -119,7 +119,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	{
 		$expression = DB::identifier($string);
 		$connection->shouldReceive('quoteIdentifier')->with($string)->once()->andReturn($string);
-		$this->assertInstanceOf('FuelPHP\Database\Expression\Identifier', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression\Identifier', $expression);
 		$this->assertEquals($string, $expression->getValue($connection));
 	}
 
@@ -129,7 +129,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	public function testExprParameter($string, $result, $connection)
 	{
 		$expression = DB::param($string);
-		$this->assertInstanceOf('FuelPHP\Database\Expression\Parameter', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression\Parameter', $expression);
 		$this->assertEquals($result, $expression->getValue($connection));
 	}
 
@@ -141,7 +141,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 		$expression = DB::increment($string, $amount);
 		$compiler->shouldReceive('compileIncrement')->once()->andReturn($result);
 		$connection->shouldReceive('getCompiler')->once()->andReturn($compiler);
-		$this->assertInstanceOf('FuelPHP\Database\Expression\Increment', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression\Increment', $expression);
 		$this->assertEquals($result, $expression->getValue($connection));
 	}
 
@@ -153,7 +153,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 		$expression = DB::command($name);
 		$expression->arguments = $params;
 		$expression->alias($alias);
-		$this->assertInstanceOf('FuelPHP\Database\Expression\Command', $expression);
+		$this->assertInstanceOf('Fuel\Database\Expression\Command', $expression);
 		if ($expectedCall)
 		{
 			$compiler->shouldReceive($expectedCall)->once()->andReturn($result);
@@ -229,7 +229,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException FuelPHP\Database\Exception
+	 * @expectedException Fuel\Database\Exception
 	 */
 	public function testInvalidConnection()
 	{

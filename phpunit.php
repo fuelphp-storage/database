@@ -4,6 +4,6 @@ include './vendor/autoload.php';
 
 class_alias('Mockery', 'M');
 
-$manager = new FuelPHP\Alias\Manager;
+$manager = new Fuel\Alias\Manager;
 $manager->register();
-$manager->aliasNamespace('FuelPHP\Database', '');
+$manager->aliasNamespace('Fuel\Database', '');

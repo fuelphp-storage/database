@@ -51,11 +51,11 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 		$connection = DB::connection(array(
 			'dsn' => 'mysql:',
 		));
-		$this->assertInstanceOf('FuelPHP\Database\Compiler', $connection->getCompiler());
+		$this->assertInstanceOf('Fuel\Database\Compiler', $connection->getCompiler());
 		$this->assertInstanceOf('Doctrine\DBAL\Schema\AbstractSchemaManager', $connection->getSchemaManager());
-		$this->assertInstanceOf('FuelPHP\Database\Query', $connection->query('Statement'));
-		$this->assertInstanceOf('FuelPHP\Database\Schema', $connection->getSchema());
-		$this->assertInstanceOf('FuelPHP\Database\Collector\Select', $connection->select('Statement'));
+		$this->assertInstanceOf('Fuel\Database\Query', $connection->query('Statement'));
+		$this->assertInstanceOf('Fuel\Database\Schema', $connection->getSchema());
+		$this->assertInstanceOf('Fuel\Database\Collector\Select', $connection->select('Statement'));
 	}
 
 	/**
@@ -245,7 +245,7 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException FuelPHP\Database\Exception
+	 * @expectedException Fuel\Database\Exception
 	 */
 	public function testFailedQuery()
 	{

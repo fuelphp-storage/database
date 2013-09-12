@@ -3,16 +3,16 @@
     "description": "FuelPHP Database Component",
     "autoload": {
 		"psr-0": {
-            "FuelPHP\\Database": "src/"
+            "Fuel\\Database": "src/"
         }
 	},
 	"require": {
 		"psr/log": "1.0.*",
-		"doctrine/dbal": "2.3.*"
+		"doctrine/dbal": "2.4.*"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.8.*",
-		"fuelphp/alias": "0.1.*",
+		"fuelphp/alias": "0.2.*",
 		"monolog/monolog": "1.5.*"
 	}
 }
