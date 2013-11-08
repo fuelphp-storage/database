@@ -3,6 +3,7 @@
 namespace Fuel\Database\Schema;
 
 use Doctrine\DBAL\Schema\Column as DoctrineColumn;
+use Doctrine\DBAL\Types\Type;
 
 class Column
 {
@@ -124,6 +125,36 @@ class Column
 	}
 
 	/**
+	 * Set the type of a column.
+	 *
+	 * @param   mixed  $type
+	 * @return  $this
+	 */
+	public function setType($type)
+	{
+		if (is_string($type)) {
+			$type = Type::getType($type);
+		}
+
+		$this->column->setType($type);
+
+		return $this;
+	}
+
+	/**
+	 * Set the type of a column.
+	 *
+	 * @param   mixed  $type
+	 * @return  $this
+	 */
+	public function getType()
+	{
+		$type = $this->column->getType();
+
+		return $type->getName();
+	}
+
+	/**
 	 * __toString
 	 *
 	 * @return  string  column name
@@ -157,5 +188,4 @@ class Column
 
 		return $result;
 	}
-
 }

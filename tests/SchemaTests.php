@@ -26,7 +26,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			'database' => 'fuelphp_database_tests',
 			'host' => 'localhost',
 			'username' => 'root',
-			'password' => '',
+			'password' => 'root',
 			'persistent' => true,
 		));
 
@@ -65,6 +65,11 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 	public function testCreateTable($connection)
 	{
 		$schema = $connection->getSchema();
+
+		if ($schema->hasTable('test_table')) {
+			$schema->dropTable('test_table');
+		}
+
 		$schema->createTable('test_table', function($table){
 			$table->increment('id', 255)->primary();
 			$table->string('name', 255)->unique();
@@ -73,6 +78,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			$table->text('bio');
 			$table->decimal('decim', 1,1);
 			$table->float('floa', 1,1);
+			$table->string('string_to_bool', 10);
 			$table->engine('MyISAM')->charset('utf8')->collate('utf8_general_ci');
 			$table->fulltext(array('name', 'surname'), 'name_fulltext');
 		});
@@ -86,8 +92,8 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 		$bio = $schema->getColumn('test_table', 'bio');
 		$this->assertEquals('bio', (string) $bio);
 		$this->assertEquals('test_table', (string) $schema->getTable('test_table'));
-		$this->assertEquals('String', (string) $name->getType());
-		$this->assertEquals('Text', (string) $bio->getType());
+		$this->assertEquals('string', (string) $name->getType());
+		$this->assertEquals('text', (string) $bio->getType());
 		$this->assertEquals(255, $name->getLength());
 		$this->assertInternalType('array', $schema->getTable('test_table')->getOptions());
 
@@ -96,9 +102,12 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 			$table->change('name')->length(200);
 			$table->rename('bool', 'bool_renamed');
 			$table->dropIndex('my_index');
+			$table->change('string_to_bool')->setType('boolean');
 			$table->changeColumn('name', array('default' => 'something'));
 		});
 		$name = $schema->getColumn('test_table', 'name');
+		$string_to_bool = $schema->getColumn('test_table', 'string_to_bool');
+		$this->assertEquals('boolean', $string_to_bool->getType());
 		$this->assertEquals(200, $name->getLength());
 		$this->assertFalse($schema->hasColumn('test_table', 'bio'));
 		$this->assertInstanceOf('Doctrine\DBAL\Schema\Table', $schema->tableDetails('test_table'));

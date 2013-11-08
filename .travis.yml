@@ -8,6 +8,7 @@ before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev
   - mysql -e 'create database fuelphp_database_tests;'
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
 
 script: phpunit --coverage-text
 

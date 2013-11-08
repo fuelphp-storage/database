@@ -34,7 +34,7 @@ abstract class Connection implements LoggerAwareInterface
 		'lateProperties'    => false,
 		'resultCollection'  => null,
 		'connection'        => null,
-		'autoConnect'       => true,
+		'autoConnect'       => false,
 		'dsn'               => false,
 		'username'          => '',
 		'password'          => '',
@@ -48,6 +48,7 @@ abstract class Connection implements LoggerAwareInterface
 		'database'          => null,
 		'logger'            => null,
 		'pdo'               => null,
+		'replication'       => false,
 	);
 
 	/**
@@ -234,6 +235,21 @@ abstract class Connection implements LoggerAwareInterface
 	}
 
 	/**
+	 * Ensure a connection is made
+	 *
+	 * @return  $this
+	 */
+	public function ensureConnection()
+	{
+		if ( ! $this->pdo)
+		{
+			return $this->connect();
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Set the connection charset
 	 *
 	 * @param   string  $charset  charset
@@ -404,6 +420,8 @@ abstract class Connection implements LoggerAwareInterface
 	 */
 	public function execute($type, $query, $params = array(), $options = array())
 	{
+		$this->ensureConnection();
+
 		$type = ucfirst($type);
 		$replacements = array();
 		$input = array();
