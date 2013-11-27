@@ -409,9 +409,10 @@ abstract class Compiler
 			}
 
 			// Quote the table name that is being joined
-			$sql .= ' '.$this->quoteIdentifier($join->table).' ON ';
+			$sql .= ' '.$this->quoteIdentifier($join->table);
 
 			$on_sql = '';
+
 			foreach ($join->on as $condition)
 			{
 				// Split the condition
@@ -427,7 +428,7 @@ abstract class Compiler
 				$on_sql .= (empty($on_sql) ? '' : ' '.$andOr.' ').$this->quoteIdentifier($c1).$op.' '.$this->quoteIdentifier($c2);
 			}
 
-			empty($on_sql) or $sql .= '('.$on_sql.')';
+			empty($on_sql) or $sql .= ' ON ('.$on_sql.')';
 
 			$return[] = $sql;
 		}
