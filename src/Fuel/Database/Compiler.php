@@ -640,7 +640,7 @@ abstract class Compiler
 			$parts = explode('.', $value);
 
 			// Quote each of the parts
-			return implode('.', array_map(array($this, 'wrapIdentifier'), $parts));
+			return implode('.', array_map(array($this, 'quoteIdentifier'), $parts));
 		}
 
 		return $this->wrapIdentifier($value);
