@@ -546,7 +546,7 @@ abstract class Compiler
 
 		elseif (is_bool($value))
 		{
-			return "'".(string) $value."'";
+			return $value ? "'1'" : "'0'";
 		}
 
 		elseif ($value instanceof Query)

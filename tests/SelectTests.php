@@ -100,6 +100,10 @@ class SelectTests extends PHPUnit_Framework_TestCase
 		$expected .= ' OR `num` IN (1, 2, 3.1)';
 		$this->assertEquals($expected, $select->getQuery());
 
+		$select->where('boolean', false);
+		$expected .= ' AND `boolean` = \'0\'';
+		$this->assertEquals($expected, $select->getQuery());
+
 		$select->orWhere(function($query){
 			$query->andWhereArray(array('a' => 'b'))->where('a', '!=', null)->orWhere('a', 2);
 		});
