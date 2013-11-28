@@ -533,7 +533,6 @@ abstract class Compiler
 	 */
 	public function quote($value)
 	{
-
 		if ($value === '?')
 		{
 			return $value;
