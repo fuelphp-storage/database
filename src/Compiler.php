@@ -345,10 +345,11 @@ abstract class Compiler
 			{
 				extract($orderBy);
 
+                $direction = strtoupper($direction);
 				if ( ! empty($direction))
 				{
 					// Make the direction uppercase
-					$direction = ' '.strtoupper($direction);
+					$direction = ' '.($direction == 'ASC' ? 'ASC' : 'DESC');
 				}
 
 				$sort[] = $this->quoteIdentifier($column).$direction;
@@ -624,18 +625,10 @@ abstract class Compiler
 		// Convert all other types to string
 		$value = (string) $value;
 
-		if (strpos($value, '"') !== false)
+		if (strpos($value, '.') !== false)
 		{
-			// Quote the column in FUNC("ident") identifiers
-			$quoter = array($this, 'quoteIdentifier');
-			$callback = function ($matches) use ($quoter) {
-				return call_user_func($quoter, trim($matches[0], '"'));
-			};
-
-			return preg_replace_callback('/"(.+?)"/', $callback, $value);
-		}
-		elseif (strpos($value, '.') !== false)
-		{
+			// This is slightly broken, because a table or column name
+			// (or user-defined alias!) might legitimately contain a period.
 			// Split the identifier into the individual parts
 			$parts = explode('.', $value);
 
@@ -654,6 +647,6 @@ abstract class Compiler
 	 */
 	public function wrapIdentifier($identifier)
 	{
-		return $this->tableQuote.$identifier.$this->tableQuote;
+        return $this->tableQuote.str_replace($this->tableQuote, $this->tableQuote.$this->tableQuote, $identifier).$this->tableQuote;
 	}
 }

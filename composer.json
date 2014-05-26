@@ -2,8 +2,8 @@
     "name": "fuelphp/database",
     "description": "FuelPHP Database Component",
     "autoload": {
-		"psr-0": {
-            "Fuel\\Database": "src/"
+		"psr-4": {
+            "Fuel\\Database\\": "src/"
         }
 	},
 	"require": {
