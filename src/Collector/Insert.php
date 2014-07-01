@@ -68,7 +68,7 @@ class Insert extends Collector
 		foreach($values as $v)
 		{
 			$keys = array_keys($v);
-			$this->columns = array_merge($this->columns, $keys);
+			$this->columns = array_unique(array_merge($this->columns, $keys));
 
 			if($merge and count($this->values))
 			{
