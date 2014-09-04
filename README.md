@@ -1,3 +1,9 @@
+# Database
+
+Database abstraction layer for FuelPHP
+
+## Sample code until examples can be constructed
+```php
 <?php
 
 include 'vendor/autoload.php';
@@ -167,3 +173,4 @@ $connection->delete('menu')
 	));
 
 print_r($connection->lastQuery());
+```

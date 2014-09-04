@@ -1,7 +1,13 @@
 <?php
 
-class SchemaTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+
+class SchemaTest extends Test
 {
+
 	public function testGetPlatform()
 	{
 		$connection = M::mock('Fuel\Database\Connection');
@@ -36,8 +42,8 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @dataProvider  connectionProvider
-	 * @expectedException  BadMethodCallException
+	 * @dataProvider      connectionProvider
+	 * @expectedException \BadMethodCallException
 	 */
 	public function testInvalidTableCall($connection)
 	{
@@ -48,8 +54,8 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @dataProvider  connectionProvider
-	 * @expectedException  BadMethodCallException
+	 * @dataProvider      connectionProvider
+	 * @expectedException \BadMethodCallException
 	 */
 	public function testInvalidColumnCall($connection)
 	{
@@ -60,7 +66,7 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @dataProvider  connectionProvider
+	 * @dataProvider connectionProvider
 	 */
 	public function testCreateTable($connection)
 	{
@@ -114,4 +120,5 @@ class SchemaTests extends PHPUnit_Framework_TestCase
 		$schema->dropTable('test_table');
 		$this->assertFalse($schema->hasTable('test_table'));
 	}
+
 }

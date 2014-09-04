@@ -517,7 +517,7 @@ abstract class Compiler
 			$parts[] = $c['field'].' '.$c['op'].' '.$c['value'];
 		}
 
-		return implode($parts);
+		return implode('', $parts);
 	}
 
 	/**

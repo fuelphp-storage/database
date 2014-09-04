@@ -1,3 +1,4 @@
 vendor/*
-coverage/*
+.idea
 composer.lock
+tests/_output/*

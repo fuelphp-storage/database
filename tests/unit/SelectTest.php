@@ -1,7 +1,13 @@
 <?php
 
-class SelectTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+
+class SelectTest extends Test
 {
+
 	public function connectionProvider()
 	{
 		return array(
@@ -25,7 +31,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @dataProvider  connectionProvider
+	 * @dataProvider connectionProvider
 	 */
 	public function testSelect($connection)
 	{
@@ -176,7 +182,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testInvalidOn()
 	{
@@ -189,7 +195,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testInvalidAndOn()
 	{
@@ -202,7 +208,7 @@ class SelectTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testInvalidOrOn()
 	{

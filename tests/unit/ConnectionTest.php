@@ -1,6 +1,13 @@
 <?php
 
-class ConnectionTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+use PDO;
+use stdClass;
+
+class ConnectionTest extends Test
 {
 	public function testConstruct()
 	{
@@ -245,7 +252,7 @@ class ConnectionTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testFailedQuery()
 	{

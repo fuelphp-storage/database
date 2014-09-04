@@ -1,6 +1,11 @@
 <?php
 
-class InsertTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+
+class InsertTest extends Test
 {
 	public function connectionProvider()
 	{

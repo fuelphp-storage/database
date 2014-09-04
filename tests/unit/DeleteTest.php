@@ -1,6 +1,11 @@
 <?php
 
-class UpdateTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+
+class DeleteTest extends Test
 {
 	public function connectionProvider()
 	{
@@ -27,18 +32,11 @@ class UpdateTests extends PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider  connectionProvider
 	 */
-	public function testUpdate($connection)
+	public function testDelete($connection)
 	{
-		$update = $connection->update('table')->table('input');
-		$pdo = $connection->getPdo();
-		$pdo->shouldReceive('quote')->andReturnUsing(function($value){
-			return $value;
-		});
-		$update->set('col', 'value')->increment('age');
-		$sql = $update->getQuery();
-		$this->assertStringStartsWith('UPDATE', $sql);
+		$delete = $connection->delete('table')->from('input');
+		$sql = $delete->getQuery();
+		$this->assertStringStartsWith('DELETE FROM', $sql);
 		$this->assertStringMatchesFormat('%ainput%a', $sql);
-		$this->assertStringMatchesFormat('%a SET %a', $sql);
-		$this->assertStringMatchesFormat('%a + %a', $sql);
 	}
 }

@@ -11,8 +11,7 @@
 		"doctrine/dbal": "2.4.*"
 	},
 	"require-dev": {
-		"mockery/mockery": "0.8.*",
-		"fuelphp/alias": "0.2.*",
-		"monolog/monolog": "1.5.*"
+		"codeception/codeception": "2.0",
+		"codeception/mockery-module": "dev-master"
 	}
 }

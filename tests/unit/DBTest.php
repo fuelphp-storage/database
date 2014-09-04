@@ -1,6 +1,11 @@
 <?php
 
-class DBTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+
+class DBTest extends Test
 {
 	public function mockConnection()
 	{
@@ -229,7 +234,7 @@ class DBTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testInvalidConnection()
 	{

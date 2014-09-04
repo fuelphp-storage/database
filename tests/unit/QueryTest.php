@@ -1,6 +1,12 @@
 <?php
 
-class QueryTests extends PHPUnit_Framework_TestCase
+namespace Fuel\Database;
+
+use Codeception\TestCase\Test;
+use Mockery as M;
+use stdClass;
+
+class QueryTest extends Test
 {
 	public function methodProvider()
 	{
@@ -143,7 +149,7 @@ class QueryTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testInvalidConnectionExecute()
 	{
@@ -152,7 +158,7 @@ class QueryTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\Database\Exception
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testNoConnection()
 	{
