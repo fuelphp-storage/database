@@ -15,12 +15,14 @@ class ConnectionTest extends Test
 			'autoConnect' => false,
 			'driver' => 'mysql',
 			'persistent' => true,
+			'username' => 'root',
 		));
 
 		$this->assertInstanceOf('PDO', $connection->getPdo());
 
 		$connection = DB::connection(array(
 			'driver' => 'mysql',
+			'username' => 'root',
 		));
 
 		$this->assertInstanceOf('PDO', $connection->getPdo());
@@ -57,6 +59,7 @@ class ConnectionTest extends Test
 	{
 		$connection = DB::connection(array(
 			'dsn' => 'mysql:',
+			'username' => 'root',
 		));
 		$this->assertInstanceOf('Fuel\Database\Compiler', $connection->getCompiler());
 		$this->assertInstanceOf('Doctrine\DBAL\Schema\AbstractSchemaManager', $connection->getSchemaManager());
@@ -252,7 +255,7 @@ class ConnectionTest extends Test
 	}
 
 	/**
-	 * @expectedException \Fuel\Database\Exception
+	 * @expectedException \PDOException
 	 */
 	public function testFailedQuery()
 	{
