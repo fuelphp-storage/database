@@ -228,7 +228,7 @@ class DBTest extends Test
      */
 	public function testFactoryMethods($method, $arguments, $class)
 	{
-		$result = call_user_func_array('DB::'.$method, $arguments);
+		$result = call_user_func_array('Fuel\Database\DB::'.$method, $arguments);
 
 		$this->assertInstanceOf($class, $result);
 	}

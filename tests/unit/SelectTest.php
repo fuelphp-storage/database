@@ -66,16 +66,16 @@ class SelectTest extends Test
 		));
 
 		$connection->getPdo()->shouldReceive('quote')->andReturnUsing(function($value){
-			return '"'.$value.'"';
+				return '"'.$value.'"';
 		});
 
 		$select = $connection->select('name')->from('users')->distinct();
 		$expected = 'SELECT DISTINCT `name` FROM `users`';
 		$this->assertEquals($expected, $select->getQuery());
 
-		$select = $connection->select('*', 'COUNT("id")', $connection->expr('NOW()'))
+		$select = $connection->select('*', $connection->expr('COUNT("id")'), $connection->expr('NOW()'))
 			->from('users', 'comments');
-		$expected = 'SELECT *, COUNT(`id`), NOW() FROM `users`, `comments`';
+		$expected = 'SELECT *, COUNT("id"), NOW() FROM `users`, `comments`';
 		$this->assertEquals($expected, $select->getQuery());
 
 		$select->join('relation')->on('a', 'b')->andOn('a', '<', 'b')->orOn('b', 'a');

@@ -32,7 +32,7 @@ class SchemaTest extends Test
 			'database' => 'fuelphp_database_tests',
 			'host' => 'localhost',
 			'username' => 'root',
-			'password' => 'root',
+			'password' => '',
 			'persistent' => true,
 		));
 

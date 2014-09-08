@@ -66,7 +66,7 @@ class ConnectionTest extends Test
 	}
 
 	/**
-	 * @expectedException  BadMethodCallException
+	 * @expectedException  \BadMethodCallException
 	 */
 	public function testInvalidMethodCall()
 	{
@@ -75,7 +75,7 @@ class ConnectionTest extends Test
 	}
 
 	/**
-	 * @expectedException  PDOException
+	 * @expectedException  \PDOException
 	 */
 	public function testInvalidDsn()
 	{
