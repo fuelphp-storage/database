@@ -218,7 +218,7 @@ abstract class Connection implements LoggerAwareInterface
 		}
 		catch (PDOException $e)
 		{
-			$this->log('critical', 'Cloud not connect to database with DSN: {dsn}.', array(
+			$this->log('critical', 'Could not connect to database with DSN: {dsn}.', array(
 				'dsn' => $dsn,
 				'exception' => $e,
 			));

@@ -255,11 +255,11 @@ class ConnectionTest extends Test
 	}
 
 	/**
-	 * @expectedException \PDOException
+	 * @expectedException \Fuel\Database\Exception
 	 */
 	public function testFailedQuery()
 	{
-		$connection = DB::connection(array());
+		$connection = DB::connection(array('username' => 'root'));
 		$connection->execute(DB::PLAIN, 'SOME QUERY');
 	}
 
