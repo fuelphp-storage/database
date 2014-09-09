@@ -2,6 +2,11 @@
 
 Database abstraction layer for FuelPHP
 
+[![Build Status](https://travis-ci.org/fuelphp/database.svg?branch=master)](https://travis-ci.org/fuelphp/database)
+[![Code Coverage](https://scrutinizer-ci.com/g/fuelphp/database/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/fuelphp/database/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fuelphp/database/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fuelphp/database/?branch=master)
+[![HHVM Status](http://hhvm.h4cc.de/badge/fuelphp/database.svg)](http://hhvm.h4cc.de/package/fuelphp/database)
+
 ## Sample code until examples can be constructed
 ```php
 <?php
